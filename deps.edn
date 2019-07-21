@@ -1,10 +1,11 @@
 {:paths   ["src/main" "resources"]
 
- :deps    {bidi                                {:mvn/version "2.1.6"}
+ :deps    {thheller/shadow-cljs                {:mvn/version "2.8.40"}
+           bidi                                {:mvn/version "2.1.6"}
            bk/ring-gzip                        {:mvn/version "0.3.0"}
            com.taoensso/timbre                 {:mvn/version "4.10.0"}
            com.wsscode/pathom                  {:mvn/version "2.2.15"}
-           com.fulcrologic/fulcro              {:local/root "/Users/tonykay/fulcrologic/fulcro3"}
+           com.fulcrologic/fulcro              {:mvn/version "3.0.0-alpha-16-1"}
            com.fulcrologic/fulcro-garden-css   {:mvn/version "3.0.4"}
            com.fulcrologic/semantic-ui-wrapper {:mvn/version "1.0.0-SNAPSHOT"}
            gnl/ghostwheel                      {:mvn/version "0.4.0-SNAPSHOT"}
