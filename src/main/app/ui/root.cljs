@@ -137,14 +137,15 @@
 
 (def ui-login (comp/factory Login))
 
-(defsc Main [this props]
+(defsc Main [this {:main/keys [welcome-message]}]
   {:query         [:main/welcome-message]
-   :initial-state {:main/welcome-message "Hi!"}
+   :initial-state {:main/welcome-message "Hello world!"}
    :ident         (fn [] [:component/id :main])
    :route-segment ["main"]
    :will-enter    (fn [_ _] (dr/route-immediate [:component/id :main]))}
   (div :.ui.container.segment
-    (h3 "Main")))
+    (h3 "Main")
+    (p welcome-message)))
 
 (defsc Settings [this {:keys [:account/time-zone :account/real-name] :as props}]
   {:query         [:account/time-zone :account/real-name]
@@ -155,8 +156,43 @@
   (div :.ui.container.segment
     (h3 "Settings")))
 
+(defsc Post [this {:post/keys [title body] :as props}]
+  {:query [:post/id :post/title :post/body]
+   :ident (fn [] [:post/id (:post/id props)])
+   :initial-state (fn [{:keys [id title body] :as params}] {:post/id id :post/title title :post/body body})}
+  (dom/li
+    (dom/h5 title)
+    (dom/p body)))
+
+(def ui-post (comp/factory Post {:keyfn :post/id}))
+
+(defsc PostList [this {:list/keys [id label posts] :as props}]
+  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}]
+   :ident (fn [] [:list/id (:list/id props)])
+   :route-segment ["posts"]
+   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
+   :initial-state (fn [{:keys [id label]}]
+                    {:list/id id
+                     :list/label label
+                     :list/posts [(comp/get-initial-state Post {:id 1 :title "Hello" :body "world!"})
+                                  (comp/get-initial-state Post {:id 2 :title "Lorem" :body "ipsum"})]})}
+  (div :.ui.container.segment
+    (h3 "Posts")
+    (dom/ul
+      (let [posts [(comp/get-initial-state Post {:id 1 :title "Hello" :body "world!"})
+                   (comp/get-initial-state Post {:id 2 :title "Lorem" :body "ipsum"})]]
+        (map ui-post posts)))))
+
+(def ui-post-list (comp/factory PostList))
+
+;(defsc PostsPage [this props]
+;  {}
+;  (dom/div
+;    (ui-post-list)))
+
+
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess Settings]})
+  {:router-targets [Main Signup SignupSuccess Settings PostList]})
 
 (def ui-top-router (comp/factory TopRouter))
 
@@ -188,6 +224,8 @@
                        :onClick (fn [] (dr/change-route this ["main"]))} "Main")
         (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["settings"]))} "Settings")
+        (dom/a :.item {:classes [(when (= :posts current-tab) "active")]
+                       :onClick (fn [] (dr/change-route this ["posts"]))} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid
