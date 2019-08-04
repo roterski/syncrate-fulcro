@@ -69,7 +69,7 @@
     (log/info "Marking complete")
     (swap! state fs/mark-complete* post-form-ident))
   (ok-action [{:keys [app state]}]
-    (dr/change-route app ["posts"]))
+    (dr/change-route app ["post-list" "all-posts"]))
   (remote [{:keys [state] :as env}] true))
     ;(let [{:post/keys [title body]} (get-in @state post-form-ident)]
     ;  (boolean (and (valid-email? email) (valid-password? password)

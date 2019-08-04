@@ -68,28 +68,28 @@
 ;                  :where [[e :post/title _]]})})
 
 (defresolver all-posts-resolver [env input]
-  {::pc/output [{:all-posts [:list/id]}]}
-  {:all-posts {:list/id :all-posts}})
+  {::pc/output [{:all-posts [:post-list/id]}]}
+  {:all-posts {:post-list/id :all-posts}})
 
-(defresolver list-resolver [env {:list/keys [id]}]
-  {::pc/input #{:list/id}
-   ::pc/output [:list/label {:list/posts [:person/id]}]}
+(defresolver list-resolver [env {:post-list/keys [id]}]
+  {::pc/input #{:post-list/id}
+   ::pc/output [:post-list/label {:post-list/posts [:person/id]}]}
   (let [post-ids (crux/q (crux/db node)
                          `{:find [e]
                            :where [[e :post/title _]]})]
-    {:list/id id
-     :list/label "All Posts"
-     :list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
+    {:post-list/id id
+     :post-list/label "All Posts"
+     :post-list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
 
-;(defresolver all-posts-resolver [env {:list/keys [id]}]
-;  {::pc/input #{:list/id}
-;   ::pc/output [:list/label {:list/posts [:person/id]}]}
+;(defresolver all-posts-resolver [env {:post-list/keys [id]}]
+;  {::pc/input #{:post-list/id}
+;   ::pc/output [:post-list/label {:post-list/posts [:person/id]}]}
 ;  (let [post-ids (crux/q (crux/db node)
 ;                         `{:find [e]
 ;                           :where [[e :post/title _]]})]
-;    {:list/id :all-posts
-;     :list/label "All Posts"
-;     :list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
+;    {:post-list/id :all-posts
+;     :post-list/label "All Posts"
+;     :post-list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
 
 (defresolver post-resolver [env {:post/keys [id]}]
   {::pc/input #{:post/id}

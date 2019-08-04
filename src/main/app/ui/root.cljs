@@ -234,10 +234,10 @@
 
 (def ui-post-form (comp/factory PostForm {:keyfn :post/id}))
 
-(defsc PostList [this {:list/keys [id label posts] :as props}]
-  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}
+(defsc PostList [this {:post-list/keys [id label posts] :as props}]
+  {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}
            {:root/post (comp/get-query PostForm)}]
-   :ident (fn [] [:list/id :all-posts])}
+   :ident (fn [] [:post-list/id :all-posts])}
   (div :.ui.container.segment
     (h3 "Posts")
     ;(ui-post-form {:post/id 4 :post/title "bob" :post/body "body"})
@@ -246,17 +246,17 @@
 
 (def ui-post-list (comp/factory PostList))
 
-(defsc PostsPage [this {:list/keys [id label posts] :as props}]
-  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}]
-   :ident :list/id
-   :route-segment ["list" :list/id]
-   ;:will-enter (fn [_ {:list/keys [id]}] (dr/route-immediate [:list/id (keyword id)]))
-   :will-enter (fn [app {:list/keys [id]}]
+(defsc PostsPage [this {:post-list/keys [id label posts] :as props}]
+  {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}]
+   :ident :post-list/id
+   :route-segment ["post-list" :post-list/id]
+   ;:will-enter (fn [_ {:post-list/keys [id]}] (dr/route-immediate [:post-list/id (keyword id)]))
+   :will-enter (fn [app {:post-list/keys [id]}]
                  (let [id (keyword id)]
-                   (dr/route-deferred [:list/id id]
-                      #(df/load app [:list/id id] PostsPage
+                   (dr/route-deferred [:post-list/id id]
+                      #(df/load app [:post-list/id id] PostsPage
                                 {:post-mutation `dr/target-ready
-                                 :post-mutation-params {:target [:list/id id]}}))))}
+                                 :post-mutation-params {:target [:post-list/id id]}}))))}
   (div :.ui.container.segment
     (h1 label)
     (when posts
@@ -308,8 +308,8 @@
                        :onClick (fn [] (dr/change-route this ["settings"]))} "Settings")
         (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post")
-        (dom/a :.item {:classes [(when (= :posts current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["list" "all-posts"]))} "Posts")
+        (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
+                       :onClick (fn [] (dr/change-route this ["post-list" "all-posts"]))} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid
