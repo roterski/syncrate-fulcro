@@ -7,6 +7,7 @@
     [com.fulcrologic.fulcro.dom.events :as evt]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
+    [com.fulcrologic.fulcro.data-fetch :as df]
     [com.fulcrologic.fulcro.ui-state-machines :as uism :refer [defstatemachine]]
     [com.fulcrologic.fulcro.components :as comp]
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]
@@ -160,9 +161,9 @@
 (defsc Post [this {:post/keys [title body] :as props}]
   {:query [:post/id :post/title :post/body]
    :ident (fn [] [:post/id (:post/id props)])}
-  (dom/li
+  (dom/div :.ui.container.segment
     (dom/h5 title)
-    (dom/p body)))
+    body))
 
 (def ui-post (comp/factory Post {:keyfn :post/id}))
 
@@ -245,15 +246,32 @@
 
 (def ui-post-list (comp/factory PostList))
 
-(defsc PostsPage [this {:keys [all-posts]}]
-  {:query [{:all-posts (comp/get-query PostList)}]
-   :route-segment ["posts"]
-   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
-   :initial-state {}}
+(defsc PostsPage [this {:list/keys [id label posts] :as props}]
+  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}]
+   :ident :list/id
+   :route-segment ["list" :list/id]
+   ;:will-enter (fn [_ {:list/keys [id]}] (dr/route-immediate [:list/id (keyword id)]))
+   :will-enter (fn [app {:list/keys [id]}]
+                 (let [id (keyword id)]
+                   (dr/route-deferred [:list/id id]
+                      #(df/load app [:list/id id] PostsPage
+                                {:post-mutation `dr/target-ready
+                                 :post-mutation-params {:target [:list/id id]}}))))}
   (div :.ui.container.segment
-    (h1 "Post Page")
-    (when all-posts
-      (ui-post-list all-posts))))
+    (h1 label)
+    (when posts
+      (map ui-post posts))))
+
+
+;(defsc PostsRoot [this {:keys [all-posts]}]
+;  {:query [{:all-posts (comp/get-query PostList)}]
+;   :route-segment ["posts"]
+;   :ident :component/id
+;   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
+;   :initial-state {}}
+;  (div
+;    (h1 "All posts")
+;    (ui-post-list all-posts)))
 
 (dr/defrouter TopRouter [this props]
   {:router-targets [Main Signup SignupSuccess PostFormAlt Settings PostsPage]})
@@ -291,7 +309,7 @@
         (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post")
         (dom/a :.item {:classes [(when (= :posts current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["posts"]))} "Posts")
+                       :onClick (fn [] (dr/change-route this ["list" "all-posts"]))} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid
