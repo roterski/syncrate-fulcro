@@ -1,7 +1,9 @@
 (ns app.ui.root
   (:require
     [app.model.session :as session]
-    [app.model.post :as post]
+    [app.posts.model :as post]
+    [app.posts.ui :refer [PostForm PostsPage]]
+    [app.ui.components :refer [field]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.html-entities :as ent]
     [com.fulcrologic.fulcro.dom.events :as evt]
@@ -15,14 +17,6 @@
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]
     [clojure.string :as str]))
-
-(defn field [{:keys [label valid? error-message] :as props}]
-  (let [input-props (-> props (assoc :name label) (dissoc :label :valid? :error-message))]
-    (div :.ui.field
-      (dom/label {:htmlFor label} label)
-      (dom/input input-props)
-      (dom/div :.ui.error.message {:classes [(when valid? "hidden")]}
-        error-message))))
 
 (defsc SignupSuccess [this props]
   {:query         ['*]
@@ -158,123 +152,8 @@
   (div :.ui.container.segment
     (h3 "Settings")))
 
-(defsc Post [this {:post/keys [title body] :as props}]
-  {:query [:post/id :post/title :post/body]
-   :ident (fn [] [:post/id (:post/id props)])}
-  (dom/div :.ui.container.segment
-    (dom/h5 title)
-    body))
-
-(def ui-post (comp/factory Post {:keyfn :post/id}))
-
-(defmutation submit-post [{:keys [id]}]
-  (action [{:keys [state]}]
-    (swap! state (fn [s]
-                   (-> s
-                       (dissoc :root/post)
-                       (fs/entity->pristine* [:post/id id])))))
-  (remote [env] true)
-  (refresh [env] [:root/post [:post/id id]]))
-
-(defsc PostFormAlt [this {:post/keys [id title body] :as props}]
-  {:query             [:post/id :post/title :post/body fs/form-config-join]
-   :initial-state     (fn [_]
-                        (fs/add-form-config PostFormAlt
-                          {:post/title ""
-                           :post/body  ""}))
-   :form-fields       #{:post/title :post/body}
-   :ident             (fn [] post/post-form-ident)
-   :route-segment     ["new-post"]
-   :componentDidMount (fn [this]
-                        (comp/transact! this [(post/clear-post-form)]))
-   :will-enter        (fn [app _] (dr/route-immediate [:component/id :post-form]))}
-  (let [submit!  (fn [evt]
-                   (when (or (identical? true evt) (evt/enter-key? evt))
-                     (comp/transact! this [(post/create-post! {:title title :body body})])
-                     (log/info "Create post")))
-        checked? (log/spy :info (fs/checked? props))]
-    (div
-      (dom/h3 "New Post")
-      (div :.ui.form {:classes [(when checked? "error")]}
-        (field {:label         "Title"
-                :value         (or title "")
-                ;:valid?        (session/valid-email? email)
-                ;:error-message "Must be an email address"
-                :autoComplete  "off"
-                :onKeyDown     submit!
-                :onChange      #(m/set-string! this :post/title :event %)})
-        (field {:label         "Body"
-                ;:type          "password"
-                ;:value         (or password "")
-                ;:valid?        (session/valid-password? password)
-                ;:error-message "Password must be at least 8 characters."
-                :onKeyDown     submit!
-                :autoComplete  "off"
-                :onChange      #(m/set-string! this :post/body :event %)})
-        (dom/button :.ui.primary.button {:onClick #(submit! true)}
-          "Create")))))
-
-(defsc PostForm [this {:post/keys [id title body] :as props}]
-  {:query [:post/id :post/title :post/body fs/form-config-join]
-   :ident :post/id
-   :form-fields #{:title :body}}
-  (dom/div
-    (dom/div
-      (dom/input {:value (or (str title) "")
-                  :onChange #(m/set-string! this :post/title :event %)}))
-    (dom/div
-      (dom/input {:value (or (str body) "")
-                  :onChange #(m/set-string! this :post/body :event %)}))
-    (dom/div
-      (dom/button {:onClick #(comp/transact! this [(submit-post {:id id :delta (fs/dirty-fields props true)})])}
-                  "Create Post!"))
-    (dom/div
-      (dom/button {:onClick #(comp/transact! this `[(submit-post ~{:post/id 5 :post/title "test" :post/body "body"})])}
-        "Create boilerplate Post!"))))
-
-(def ui-post-form (comp/factory PostForm {:keyfn :post/id}))
-
-(defsc PostList [this {:post-list/keys [id label posts] :as props}]
-  {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}
-           {:root/post (comp/get-query PostForm)}]
-   :ident (fn [] [:post-list/id :all-posts])}
-  (div :.ui.container.segment
-    (h3 "Posts")
-    ;(ui-post-form {:post/id 4 :post/title "bob" :post/body "body"})
-    (dom/ul
-      (map ui-post posts))))
-
-(def ui-post-list (comp/factory PostList))
-
-(defsc PostsPage [this {:post-list/keys [id label posts] :as props}]
-  {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}]
-   :ident :post-list/id
-   :route-segment ["post-list" :post-list/id]
-   ;:will-enter (fn [_ {:post-list/keys [id]}] (dr/route-immediate [:post-list/id (keyword id)]))
-   :will-enter (fn [app {:post-list/keys [id]}]
-                 (let [id (keyword id)]
-                   (dr/route-deferred [:post-list/id id]
-                      #(df/load app [:post-list/id id] PostsPage
-                                {:post-mutation `dr/target-ready
-                                 :post-mutation-params {:target [:post-list/id id]}}))))}
-  (div :.ui.container.segment
-    (h1 label)
-    (when posts
-      (map ui-post posts))))
-
-
-;(defsc PostsRoot [this {:keys [all-posts]}]
-;  {:query [{:all-posts (comp/get-query PostList)}]
-;   :route-segment ["posts"]
-;   :ident :component/id
-;   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
-;   :initial-state {}}
-;  (div
-;    (h1 "All posts")
-;    (ui-post-list all-posts)))
-
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess PostFormAlt Settings PostsPage]})
+  {:router-targets [Main Signup SignupSuccess PostForm Settings PostsPage]})
 
 (def ui-top-router (comp/factory TopRouter))
 

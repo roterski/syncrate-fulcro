@@ -1,4 +1,4 @@
-(ns app.model.post
+(ns app.posts.model
   (:require
     [app.application :refer [SPA]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]

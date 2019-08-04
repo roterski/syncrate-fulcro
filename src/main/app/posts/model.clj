@@ -1,4 +1,4 @@
-(ns app.model.post
+(ns app.posts.model
   (:require
     [app.model.mock-database :as db]
     [app.model.database :refer [node]]
