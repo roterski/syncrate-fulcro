@@ -2,15 +2,16 @@
   (:require
     [app.model.mock-database :as db]
     [datascript.core :as d]
-    [ghostwheel.core :refer [>defn => | ?]]
+    ;[ghostwheel.core :refer [>defn => | ?]]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
     [taoensso.timbre :as log]
     [clojure.spec.alpha :as s]))
 
-(>defn all-account-ids
+;(>defn all-account-ids)
+(defn all-account-ids
   "Returns a sequence of UUIDs for all of the active accounts in the system"
   [db]
-  [any? => (s/coll-of uuid? :kind vector?)]
+  ;[any? => (s/coll-of uuid? :kind vector?)]
   (d/q '[:find [?v ...]
          :where
          [?e :account/active? true]
@@ -25,8 +26,9 @@
                    (fn [id] {:account/id id})
                    (all-account-ids db))})
 
-(>defn get-account [db id subquery]
-  [any? uuid? vector? => (? map?)]
+;(>defn get-account [db id subquery])
+(defn get-account [db id subquery]
+  ;[any? uuid? vector? => (? map?)]
   (d/pull db subquery [:account/id id]))
 
 (defresolver account-resolver [{:keys [db] :as env} {:account/keys [id]}]

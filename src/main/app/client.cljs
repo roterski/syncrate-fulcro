@@ -20,7 +20,6 @@
 (defn ^:export init []
   (log/info "Application starting.")
   (app/mount! SPA root/Root "app")
-  (df/load! SPA :all-posts root/PostList)
   (cssi/upsert-css "componentcss" {:component root/Root})
   (log/info "Starting session machine.")
   (uism/begin! SPA session/session-machine ::session/session

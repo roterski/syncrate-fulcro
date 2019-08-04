@@ -7,8 +7,8 @@
                      :modules    {:main {:init-fn app.client/init
                                          :entries [app.client]}}
                      ;; ghostwheel enforcement only during dev
-                     :dev        {:compiler-options
-                                  {:external-config {:ghostwheel {}}}}
+                     ;:dev        {:compiler-options
+                     ;             {:external-config {:ghostwheel {}}}}
 
                      :devtools   {:after-load app.client/refresh
                                   :preloads   [com.fulcrologic.fulcro.inspect.preload app.development-preload]}}
@@ -17,8 +17,8 @@
                      :test-dir         "resources/public/js/test"
                      :ns-regexp        "-test$"
                      ;; required for mocking to work
-                     :compiler-options {:static-fns      false
-                                        :external-config {:ghostwheel {}}}
+                     :compiler-options {:static-fns      false}
+                                        ;:external-config {:ghostwheel {}}}
                      :devtools         {:http-port          8022
                                         :http-resource-root "public"
                                         :http-root          "resources/public/js/test"}}
