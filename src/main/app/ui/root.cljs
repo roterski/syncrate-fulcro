@@ -1,7 +1,8 @@
 (ns app.ui.root
   (:require
     [app.model.session :as session]
-    [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h3 button]]
+    [app.model.post :as post]
+    [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.html-entities :as ent]
     [com.fulcrologic.fulcro.dom.events :as evt]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
@@ -158,41 +159,104 @@
 
 (defsc Post [this {:post/keys [title body] :as props}]
   {:query [:post/id :post/title :post/body]
-   :ident (fn [] [:post/id (:post/id props)])
-   :initial-state (fn [{:keys [id title body] :as params}] {:post/id id :post/title title :post/body body})}
+   :ident (fn [] [:post/id (:post/id props)])}
   (dom/li
     (dom/h5 title)
     (dom/p body)))
 
 (def ui-post (comp/factory Post {:keyfn :post/id}))
 
+(defmutation submit-post [{:keys [id]}]
+  (action [{:keys [state]}]
+    (swap! state (fn [s]
+                   (-> s
+                       (dissoc :root/post)
+                       (fs/entity->pristine* [:post/id id])))))
+  (remote [env] true)
+  (refresh [env] [:root/post [:post/id id]]))
+
+(defsc PostFormAlt [this {:post/keys [id title body] :as props}]
+  {:query             [:post/id :post/title :post/body fs/form-config-join]
+   :initial-state     (fn [_]
+                        (fs/add-form-config PostFormAlt
+                          {:post/title ""
+                           :post/body  ""}))
+   :form-fields       #{:post/title :post/body}
+   :ident             (fn [] post/post-form-ident)
+   :route-segment     ["new-post"]
+   :componentDidMount (fn [this]
+                        (comp/transact! this [(post/clear-post-form)]))
+   :will-enter        (fn [app _] (dr/route-immediate [:component/id :post-form]))}
+  (let [submit!  (fn [evt]
+                   (when (or (identical? true evt) (evt/enter-key? evt))
+                     (comp/transact! this [(post/create-post! {:title title :body body})])
+                     (log/info "Create post")))
+        checked? (log/spy :info (fs/checked? props))]
+    (div
+      (dom/h3 "New Post")
+      (div :.ui.form {:classes [(when checked? "error")]}
+        (field {:label         "Title"
+                :value         (or title "")
+                ;:valid?        (session/valid-email? email)
+                ;:error-message "Must be an email address"
+                :autoComplete  "off"
+                :onKeyDown     submit!
+                :onChange      #(m/set-string! this :post/title :event %)})
+        (field {:label         "Body"
+                ;:type          "password"
+                ;:value         (or password "")
+                ;:valid?        (session/valid-password? password)
+                ;:error-message "Password must be at least 8 characters."
+                :onKeyDown     submit!
+                :autoComplete  "off"
+                :onChange      #(m/set-string! this :post/body :event %)})
+        (dom/button :.ui.primary.button {:onClick #(submit! true)}
+          "Create")))))
+
+(defsc PostForm [this {:post/keys [id title body] :as props}]
+  {:query [:post/id :post/title :post/body fs/form-config-join]
+   :ident :post/id
+   :form-fields #{:title :body}}
+  (dom/div
+    (dom/div
+      (dom/input {:value (or (str title) "")
+                  :onChange #(m/set-string! this :post/title :event %)}))
+    (dom/div
+      (dom/input {:value (or (str body) "")
+                  :onChange #(m/set-string! this :post/body :event %)}))
+    (dom/div
+      (dom/button {:onClick #(comp/transact! this [(submit-post {:id id :delta (fs/dirty-fields props true)})])}
+                  "Create Post!"))
+    (dom/div
+      (dom/button {:onClick #(comp/transact! this `[(submit-post ~{:post/id 5 :post/title "test" :post/body "body"})])}
+        "Create boilerplate Post!"))))
+
+(def ui-post-form (comp/factory PostForm {:keyfn :post/id}))
+
 (defsc PostList [this {:list/keys [id label posts] :as props}]
-  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}]
-   :ident (fn [] [:list/id (:list/id props)])
-   :route-segment ["posts"]
-   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
-   :initial-state (fn [{:keys [id label]}]
-                    {:list/id id
-                     :list/label label
-                     :list/posts [(comp/get-initial-state Post {:id 1 :title "Hello" :body "world!"})
-                                  (comp/get-initial-state Post {:id 2 :title "Lorem" :body "ipsum"})]})}
+  {:query [:list/id :list/label {:list/posts (comp/get-query Post)}
+           {:root/post (comp/get-query PostForm)}]
+   :ident (fn [] [:list/id :all-posts])}
   (div :.ui.container.segment
     (h3 "Posts")
+    ;(ui-post-form {:post/id 4 :post/title "bob" :post/body "body"})
     (dom/ul
-      (let [posts [(comp/get-initial-state Post {:id 1 :title "Hello" :body "world!"})
-                   (comp/get-initial-state Post {:id 2 :title "Lorem" :body "ipsum"})]]
-        (map ui-post posts)))))
+      (map ui-post posts))))
 
 (def ui-post-list (comp/factory PostList))
 
-;(defsc PostsPage [this props]
-;  {}
-;  (dom/div
-;    (ui-post-list)))
-
+(defsc PostsPage [this {:keys [all-posts]}]
+  {:query [{:all-posts (comp/get-query PostList)}]
+   :route-segment ["posts"]
+   :will-enter (fn [_ _] (dr/route-immediate [:component/id :posts]))
+   :initial-state {}}
+  (div :.ui.container.segment
+    (h1 "Post Page")
+    (when all-posts
+      (ui-post-list all-posts))))
 
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess Settings PostList]})
+  {:router-targets [Main Signup SignupSuccess PostFormAlt Settings PostsPage]})
 
 (def ui-top-router (comp/factory TopRouter))
 
@@ -224,6 +288,8 @@
                        :onClick (fn [] (dr/change-route this ["main"]))} "Main")
         (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["settings"]))} "Settings")
+        (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
+                       :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post")
         (dom/a :.item {:classes [(when (= :posts current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["posts"]))} "Posts")
         (div :.right.menu

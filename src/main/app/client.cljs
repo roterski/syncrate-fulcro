@@ -20,6 +20,7 @@
 (defn ^:export init []
   (log/info "Application starting.")
   (app/mount! SPA root/Root "app")
+  (df/load! SPA :all-posts root/PostList)
   (cssi/upsert-css "componentcss" {:component root/Root})
   (log/info "Starting session machine.")
   (uism/begin! SPA session/session-machine ::session/session
@@ -33,5 +34,5 @@
   (let [s (app/current-state SPA)]
     (fdn/db->tree [{[:component/id :login] [:ui/open? :ui/error :account/email
                                             {[:root/current-session '_] (comp/get-query root/Session)}
-                                            [::uism/asm-id ::session/session]]}] {} s))
-  )
+                                            [::uism/asm-id ::session/session]]}] {} s)))
+

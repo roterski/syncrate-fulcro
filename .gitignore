@@ -30,6 +30,7 @@ examples/todo/src/quiescent_model
 figwheel_server.log
 lib
 node_modules
+data
 out
 pom.xml
 pom.xml*
