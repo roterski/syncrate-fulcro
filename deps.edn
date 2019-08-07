@@ -2,6 +2,7 @@
 
  :deps    {thheller/shadow-cljs                {:mvn/version "2.8.40"}
            bidi                                {:mvn/version "2.1.6"}
+           buddy/buddy-hashers                 {:mvn/version "1.4.0"}
            bk/ring-gzip                        {:mvn/version "0.3.0"}
            com.taoensso/timbre                 {:mvn/version "4.10.0"}
            com.wsscode/pathom                  {:mvn/version "2.2.15"}

@@ -13,13 +13,16 @@
   {::pc/sym `create-post!
    ::pc/input #{:post/title :post/body}
    ::pc/output [:post/id]}
-  (log/info "POST:" title "," body)
-  (crux/submit-tx
-    node
-    [[:crux.tx/put
-      {:crux.db/id (keyword "post.id" (str (util/uuid)))
-       :post/title title
-       :post/body body}]]))
+  (do
+    (def saved-env env)
+    (log/info "POST:" title "," body)
+    (crux/submit-tx
+      node
+      [[:crux.tx/put
+        {:crux.db/id (keyword "post.id" (str (util/uuid)))
+         :post/title title
+         :post/body body
+         :post/author (get-in saved-env [:ring/request :session :account/id])}]])))
 
 (defresolver all-posts-resolver [env input]
   {::pc/output [{:all-posts [:post-list/id]}]}
@@ -27,7 +30,7 @@
 
 (defresolver list-resolver [env {:post-list/keys [id]}]
   {::pc/input #{:post-list/id}
-   ::pc/output [:post-list/label {:post-list/posts [:person/id]}]}
+   ::pc/output [:post-list/label {:post-list/posts [:post/id]}]}
   (let [post-ids (crux/q (crux/db node)
                          `{:find [e]
                            :where [[e :post/title _]]})]
