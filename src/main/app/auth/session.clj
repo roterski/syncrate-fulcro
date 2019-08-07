@@ -1,4 +1,4 @@
-(ns app.model.session
+(ns app.auth.session
   (:require
     [app.model.mock-database :as db]
     [datascript.core :as d]

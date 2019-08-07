@@ -3,12 +3,13 @@
     [app.application :refer [SPA]]
     [com.fulcrologic.fulcro.application :as app]
     [app.ui.root :as root]
+    [app.auth.ui :as auth]
+    [app.auth.session :as session]
     [com.fulcrologic.fulcro.networking.http-remote :as net]
     [com.fulcrologic.fulcro.data-fetch :as df]
     [com.fulcrologic.fulcro.ui-state-machines :as uism]
     [com.fulcrologic.fulcro.components :as comp]
     [com.fulcrologic.fulcro-css.css-injection :as cssi]
-    [app.model.session :as session]
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro.algorithms.denormalize :as fdn]))
 
@@ -23,8 +24,8 @@
   (cssi/upsert-css "componentcss" {:component root/Root})
   (log/info "Starting session machine.")
   (uism/begin! SPA session/session-machine ::session/session
-    {:actor/login-form      root/Login
-     :actor/current-session root/Session}))
+    {:actor/login-form      auth/Login
+     :actor/current-session auth/Session}))
 
 
 (comment
@@ -32,6 +33,6 @@
   (comp/class->any SPA root/Root)
   (let [s (app/current-state SPA)]
     (fdn/db->tree [{[:component/id :login] [:ui/open? :ui/error :account/email
-                                            {[:root/current-session '_] (comp/get-query root/Session)}
+                                            {[:root/current-session '_] (comp/get-query auth/Session)}
                                             [::uism/asm-id ::session/session]]}] {} s)))
 

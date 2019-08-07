@@ -6,9 +6,9 @@
     [com.wsscode.pathom.core :as p]
     [com.wsscode.common.async-clj :refer [let-chan]]
     [clojure.core.async :as async]
-    [app.model.account :as acct]
-    [app.model.session :as session]
-    [app.model.model :as post]
+    [app.auth.account :as acct]
+    [app.auth.session :as session]
+    [app.posts.model :as post]
     [app.server-components.config :refer [config]]
     [app.model.mock-database :as db]))
 
