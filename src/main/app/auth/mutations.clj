@@ -1,17 +1,12 @@
-(ns app.auth.session
+(ns app.auth.mutations
   (:require
     [app.model.database :refer [node]]
     [app.util :as util]
     [crux.api :as crux]
     [buddy.hashers :as hashers]
-    [datascript.core :as d]
-    ;[ghostwheel.core :refer [>defn => | ?]]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
     [taoensso.timbre :as log]
-    [clojure.spec.alpha :as s]
     [com.fulcrologic.fulcro.server.api-middleware :as fmw]))
-
-(defonce account-database (atom {}))
 
 (defn find-user [email]
   (crux/q (crux/db node)
@@ -29,15 +24,6 @@
         {:crux.db/id (keyword "account.id" (str (util/uuid)))
          :account/email email
          :account/password-hash password-hash}]])))
-
-(defresolver current-session-resolver [env input]
-  {::pc/output [{::current-session [:session/valid? :account/name]}]}
-  (let [{:keys [account/name session/valid?]} (get-in env [:ring/request :session])]
-    (if valid?
-      (do
-        (log/info name "already logged in!")
-        {::current-session {:session/valid? true :account/name name}})
-      {::current-session {:session/valid? false}})))
 
 (defn response-updating-session
   "Uses `mutation-response` as the actual return value for a mutation, but also stores the data into the (cookie-based) session."
@@ -75,5 +61,3 @@
       (create-user email password)
       {:signup/result "OK"})
     (throw (ex-info "Email is taken" {:email email}))))
-
-(def resolvers [current-session-resolver login logout signup!])

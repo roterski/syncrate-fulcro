@@ -1,9 +1,12 @@
 (ns app.ui.root
   (:require
-    [app.auth.session :as session]
-    [app.auth.ui :refer [Signup SignupSuccess Login Session ui-login]]
-    [app.posts.model :as post]
-    [app.posts.ui :refer [PostForm PostsPage]]
+    [app.auth.ui.login :refer [Login ui-login]]
+    [app.auth.ui.session :refer [Session]]
+    [app.auth.ui.signup :refer [Signup]]
+    [app.auth.ui.signup-success :refer [SignupSuccess]]
+    [app.posts.mutations :as post]
+    [app.posts.ui.post-form :refer [PostForm]]
+    [app.posts.ui.post-list :refer [PostList]]
     [app.ui.components :refer [field]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.html-entities :as ent]
@@ -40,7 +43,7 @@
     (h3 "Settings")))
 
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess PostForm Settings PostsPage]})
+  {:router-targets [Main Signup SignupSuccess PostForm Settings PostList]})
 
 (def ui-top-router (comp/factory TopRouter))
 

@@ -3,8 +3,9 @@
     [app.application :refer [SPA]]
     [com.fulcrologic.fulcro.application :as app]
     [app.ui.root :as root]
-    [app.auth.ui :as auth]
-    [app.auth.session :as session]
+    [app.auth.ui.login :refer [Login]]
+    [app.auth.ui.session :refer [Session]]
+    [app.auth.state-machines :as session]
     [com.fulcrologic.fulcro.networking.http-remote :as net]
     [com.fulcrologic.fulcro.data-fetch :as df]
     [com.fulcrologic.fulcro.ui-state-machines :as uism]
@@ -24,8 +25,8 @@
   (cssi/upsert-css "componentcss" {:component root/Root})
   (log/info "Starting session machine.")
   (uism/begin! SPA session/session-machine ::session/session
-    {:actor/login-form      auth/Login
-     :actor/current-session auth/Session}))
+    {:actor/login-form      Login
+     :actor/current-session Session}))
 
 
 (comment
@@ -33,6 +34,6 @@
   (comp/class->any SPA root/Root)
   (let [s (app/current-state SPA)]
     (fdn/db->tree [{[:component/id :login] [:ui/open? :ui/error :account/email
-                                            {[:root/current-session '_] (comp/get-query auth/Session)}
+                                            {[:root/current-session '_] (comp/get-query Session)}
                                             [::uism/asm-id ::session/session]]}] {} s)))
 

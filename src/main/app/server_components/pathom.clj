@@ -7,8 +7,8 @@
     [com.wsscode.common.async-clj :refer [let-chan]]
     [clojure.core.async :as async]
     [app.auth.account :as acct]
-    [app.auth.session :as session]
-    [app.posts.model :as post]
+    [app.auth.resolvers :as session]
+    [app.posts.resolvers :as post]
     [app.server-components.config :refer [config]]
     [app.model.mock-database :as db]))
 

@@ -1,16 +1,10 @@
-(ns app.posts.model
+(ns app.posts.mutations
   (:require
-    [app.application :refer [SPA]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
-    [com.fulcrologic.fulcro.ui-state-machines :as uism]
     [taoensso.timbre :as log]
-    [com.fulcrologic.fulcro.components :as comp]
+    [app.posts.helpers :refer [post-form-ident post-form-class]]
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]
-    [com.fulcrologic.fulcro.algorithms.form-state :as fs]
-    [clojure.string :as str]))
-
-(def post-form-ident [:component/id :post-form])
-(defn post-form-class [] (comp/registry-key->class :app.posts.ui/PostForm))
+    [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
 
 (defn clear-post-form*
   [state-map]

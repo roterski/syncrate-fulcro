@@ -1,27 +1,17 @@
-(ns app.posts.ui
+(ns app.posts.ui.post-form
   (:require
-    [app.posts.model :as post]
+    [app.posts.mutations :as post]
+    [app.posts.helpers :refer [post-form-ident]]
     [app.ui.components :refer [field]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
-    [com.fulcrologic.fulcro.data-fetch :as df]
     [com.fulcrologic.fulcro.components :as comp]
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
-
-
-(defsc Post [this {:post/keys [title body] :as props}]
-  {:query [:post/id :post/title :post/body]
-   :ident (fn [] [:post/id (:post/id props)])}
-  (dom/div :.ui.container.segment
-    (dom/h5 title)
-    body))
-
-(def ui-post (comp/factory Post {:keyfn :post/id}))
 
 (defsc PostForm [this {:post/keys [id title body] :as props}]
   {:query             [:post/id :post/title :post/body fs/form-config-join]
@@ -30,7 +20,7 @@
                           {:post/title ""
                            :post/body  ""}))
    :form-fields       #{:post/title :post/body}
-   :ident             (fn [] post/post-form-ident)
+   :ident             (fn [] post-form-ident)
    :route-segment     ["new-post"]
    :componentDidMount (fn [this]
                         (comp/transact! this [(post/clear-post-form)]))
@@ -60,19 +50,3 @@
                 :onChange      #(m/set-string! this :post/body :event %)})
         (dom/button :.ui.primary.button {:onClick #(submit! true)}
           "Create")))))
-
-(defsc PostsPage [this {:post-list/keys [id label posts] :as props}]
-  {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}]
-   :ident :post-list/id
-   :route-segment ["post-list" :post-list/id]
-   ;:will-enter (fn [_ {:post-list/keys [id]}] (dr/route-immediate [:post-list/id (keyword id)]))}
-   :will-enter (fn [app {:post-list/keys [id]}]
-                 (let [id (keyword id)]
-                   (dr/route-deferred [:post-list/id id]
-                      #(df/load app [:post-list/id id] PostsPage
-                                {:post-mutation `dr/target-ready
-                                 :post-mutation-params {:target [:post-list/id id]}}))))}
-  (div :.ui.container.segment
-    (h1 label)
-    (when posts
-      (map ui-post posts))))

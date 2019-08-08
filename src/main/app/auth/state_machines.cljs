@@ -1,13 +1,9 @@
-(ns app.auth.session
+(ns app.auth.state-machines
   (:require
     [app.application :refer [SPA]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [com.fulcrologic.fulcro.ui-state-machines :as uism]
-    [taoensso.timbre :as log]
-    [com.fulcrologic.fulcro.components :as comp]
-    [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]
-    [com.fulcrologic.fulcro.algorithms.form-state :as fs]
-    [clojure.string :as str]))
+    [com.fulcrologic.fulcro.mutations :as m]))
 
 (defn clear [env]
   (uism/assoc-aliased env :error ""))
@@ -16,13 +12,13 @@
   (-> env
     (clear)
     (uism/assoc-aliased :username "" :session-valid? false :current-user "")
-    (uism/trigger-remote-mutation :actor/login-form 'app.auth.session/logout {})
+    (uism/trigger-remote-mutation :actor/login-form 'app.auth.mutations/logout {})
     (uism/activate :state/logged-out)))
 
 (defn login [{::uism/keys [event-data] :as env}]
   (-> env
     (clear)
-    (uism/trigger-remote-mutation :actor/login-form 'app.auth.session/login
+    (uism/trigger-remote-mutation :actor/login-form 'app.auth.mutations/login
       {:username          (:username event-data)
        :password          (:password event-data)
        ::m/returning      (uism/actor-class env :actor/current-session)
@@ -89,35 +85,3 @@
     {::uism/events (merge global-events
                      {:event/login {::uism/target-states #{:state/checking-session}
                                     ::uism/handler       login}})}}})
-
-(def signup-ident [:component/id :signup])
-(defn signup-class [] (comp/registry-key->class :app.auth.ui/Signup))
-
-(defn clear-signup-form*
-  "Mutation helper: Updates state map with a cleared signup form that is configured for form state support."
-  [state-map]
-  (-> state-map
-    (assoc-in signup-ident
-      {:account/email          ""
-       :account/password       ""
-       :account/password-again ""})
-    (fs/add-form-config* (signup-class) signup-ident)))
-
-(defmutation clear-signup-form [_]
-  (action [{:keys [state]}]
-    (swap! state clear-signup-form*)))
-
-(defn valid-email? [email] (str/includes? email "@"))
-(defn valid-password? [password] (> (count password) 7))
-
-(defmutation signup! [_]
-  (action [{:keys [state]}]
-    (log/info "Marking complete")
-    (swap! state fs/mark-complete* signup-ident))
-  (ok-action [{:keys [app state]}]
-    (dr/change-route app ["signup-success"]))
-  (remote [{:keys [state] :as env}]
-    (let [{:account/keys [email password password-again]} (get-in @state signup-ident)]
-      (boolean (and (valid-email? email) (valid-password? password)
-                 (= password password-again))))))
-
