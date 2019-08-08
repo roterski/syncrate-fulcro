@@ -22,7 +22,6 @@
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]
     [clojure.string :as str]))
 
-
 (defsc Main [this {:main/keys [welcome-message]}]
   {:query         [:main/welcome-message]
    :initial-state {:main/welcome-message "Hello world!"}
