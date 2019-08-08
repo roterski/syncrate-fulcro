@@ -9,6 +9,7 @@
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
+    [com.fulcrologic.fulcro.ui-state-machines :as uism]
     [com.fulcrologic.fulcro.components :as comp]))
 
 (defsc Main [this {:main/keys [welcome-message]}]
