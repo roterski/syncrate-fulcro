@@ -1,7 +1,7 @@
 (ns app.model.account-test
   (:require
     [app.server-components.pathom :refer [build-parser]]
-    [app.model.account :as acct]
+    [app.auth.account :as acct]
     [app.util :refer [uuid]]
     [clojure.test :refer [deftest is]]
     [fulcro-spec.core :refer [specification provided behavior assertions component provided!]]
