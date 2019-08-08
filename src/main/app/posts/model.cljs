@@ -10,7 +10,7 @@
     [clojure.string :as str]))
 
 (def post-form-ident [:component/id :post-form])
-(defn post-form-class [] (comp/registry-key->class :app.ui.root/PostForm))
+(defn post-form-class [] (comp/registry-key->class :app.posts.ui/PostForm))
 
 (defn clear-post-form*
   [state-map]

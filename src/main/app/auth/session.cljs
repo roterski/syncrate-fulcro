@@ -91,7 +91,7 @@
                                     ::uism/handler       login}})}}})
 
 (def signup-ident [:component/id :signup])
-(defn signup-class [] (comp/registry-key->class :app.ui.root/Signup))
+(defn signup-class [] (comp/registry-key->class :app.auth.ui/Signup))
 
 (defn clear-signup-form*
   "Mutation helper: Updates state map with a cleared signup form that is configured for form state support."
