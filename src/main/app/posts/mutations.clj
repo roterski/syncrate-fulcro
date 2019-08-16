@@ -4,6 +4,8 @@
     [app.util :as util]
     [crux.api :as crux]
     [talltale.core :as tt]
+    [taoensso.timbre :as log]
+    [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
 (defn random-name []
@@ -31,4 +33,6 @@
    ::pc/input #{:post/title :post/body}
    ::pc/output [:post/id]}
   (let [account-id (get-in env [:ring/request :session :account/id])]
-    (create-post-with-profile title body account-id)))
+    (if account-id
+      (create-post-with-profile title body account-id)
+      (throw (ex-info "Unauthorized" {:status-code 403 :message "not authenticated"})))))
