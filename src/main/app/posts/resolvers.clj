@@ -34,7 +34,7 @@
 
 (defresolver post-resolver [env {:post/keys [id]}]
   {::pc/input #{:post/id}
-   ::pc/output [:post/title :post/body :post/profile]}
+   ::pc/output [:post/title :post/body :post/author]}
   (crux/entity (crux/db node) id))
 
 (defresolver profile-resolver [env {:profile/keys [id]}]

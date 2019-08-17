@@ -1,6 +1,7 @@
 (ns app.posts.mutations
   (:require
     [app.model.database :refer [node get-entities]]
+    [app.auth.resolvers :as auth]
     [app.util :as util]
     [crux.api :as crux]
     [talltale.core :as tt]
@@ -21,7 +22,7 @@
           {:crux.db/id post-id
            :post/title title
            :post/body body
-           :post/profile {:profile/id profile-uuid}}]
+           :post/author {:profile/id profile-uuid}}]
          [:crux.tx/put
           {:crux.db/id profile-uuid
            :profile/name (random-name)

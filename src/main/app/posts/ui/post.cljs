@@ -10,16 +10,16 @@
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
 
-(defsc Post [this {:post/keys [id title body profile]}]
+(defsc Post [this {:post/keys [id title body author]}]
   {:query [:post/id
            :post/title
            :post/body
-           {:post/profile (comp/get-query Profile)}]
+           {:post/author (comp/get-query Profile)}]
    :ident (fn [] [:post/id id])}
   (dom/div :.ui.container.segment
     (div
       (dom/h5 title)
       (p body)
-      (ui-profile profile))))
+      (ui-profile author))))
 
 (def ui-post (comp/factory Post {:keyfn :post/id}))
