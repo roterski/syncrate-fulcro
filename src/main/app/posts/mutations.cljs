@@ -22,7 +22,9 @@
   (action [{:keys [state]}]
     (log/info "Marking complete")
     (swap! state fs/mark-complete* post-form-ident))
-  (ok-action [{:keys [app state]}]
+  (ok-action [{:keys [app state] :as params}]
     (dr/change-route app ["post-list" "all-posts"]))
+  (error-action [env]
+    (log/error "Error action")
+    (log/error env))
   (remote [{:keys [state] :as env}] true))
-
