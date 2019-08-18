@@ -51,10 +51,12 @@
       (div :.ui.secondary.pointing.menu
         (dom/a :.item {:classes [(when (= :main current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["main"]))} "Main")
-        (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["settings"]))} "Settings")
-        (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post")
+        (when (:session/valid? current-session)
+          (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
+                        :onClick (fn [] (dr/change-route this ["settings"]))} "Settings"))
+        (when (:session/valid? current-session)
+          (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
+                        :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post"))
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["post-list" "all-posts"]))} "Posts")
         (div :.right.menu
