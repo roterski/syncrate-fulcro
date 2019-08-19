@@ -24,6 +24,7 @@
   (app/mount! SPA root/Root "app")
   (cssi/upsert-css "componentcss" {:component root/Root})
   (log/info "Starting session machine.")
+  (df/load! SPA :app.auth.resolvers/current-session Session)
   (uism/begin! SPA session/session-machine ::session/session
     {:actor/login-form      Login
      :actor/current-session Session}))

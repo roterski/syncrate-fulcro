@@ -1,7 +1,7 @@
 (ns app.auth.resolvers
   (:require
     [app.auth.mutations :refer [login logout signup!]]
-    [app.model.database :refer [node]]
+    [app.database.crux :refer [node]]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
     [taoensso.timbre :as log]))
 
