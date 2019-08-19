@@ -5,10 +5,6 @@
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
-(defresolver all-posts-resolver [env input]
-  {::pc/output [{:all-posts [:post-list/id]}]}
-  {:all-posts {:post-list/id :all-posts}})
-
 (defresolver list-resolver [env {:post-list/keys [id]}]
   {::pc/input #{:post-list/id}
    ::pc/output [:post-list/label {:post-list/posts [:post/id]}]}
@@ -42,7 +38,7 @@
    ::pc/output [:profile/name]}
   (crux/entity (crux/db node) id))
 
-(def resolvers [all-posts-resolver list-resolver post-resolver create-post! profile-resolver])
+(def resolvers [list-resolver post-resolver create-post! profile-resolver])
 
 (comment
   (all-profiles)
