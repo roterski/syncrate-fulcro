@@ -1,14 +1,14 @@
 (ns app.posts.resolvers
   (:require
     [app.posts.mutations :refer [create-post!]]
-    [app.database.crux :refer [node get-entities]]
+    [app.database.crux :refer [get-entities]]
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
-(defresolver list-resolver [env {:post-list/keys [id]}]
+(defresolver list-resolver [{:keys [db]} {:post-list/keys [id]}]
   {::pc/input #{:post-list/id}
    ::pc/output [:post-list/label {:post-list/posts [:post/id]}]}
-  (let [post-ids (crux/q (crux/db node)
+  (let [post-ids (crux/q db
                          `{:find [e]
                            :where [[e :post/title _]]})]
     {:post-list/id id
@@ -28,15 +28,15 @@
   (get-entities `{:find [?e]
                   :where [[?e :profile/account ~account-id]]}))
 
-(defresolver post-resolver [env {:post/keys [id]}]
+(defresolver post-resolver [{:keys [db]} {:post/keys [id]}]
   {::pc/input #{:post/id}
    ::pc/output [:post/title :post/body :post/author]}
-  (crux/entity (crux/db node) id))
+  (crux/entity db id))
 
-(defresolver profile-resolver [env {:profile/keys [id]}]
+(defresolver profile-resolver [{:keys [db]} {:profile/keys [id]}]
   {::pc/input #{:profile/id}
    ::pc/output [:profile/name]}
-  (crux/entity (crux/db node) id))
+  (crux/entity db id))
 
 (def resolvers [list-resolver post-resolver create-post! profile-resolver])
 

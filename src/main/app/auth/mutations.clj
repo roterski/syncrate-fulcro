@@ -1,6 +1,5 @@
 (ns app.auth.mutations
   (:require
-    [app.database.crux :refer [node]]
     [app.util :as util]
     [crux.api :as crux]
     [buddy.hashers :as hashers]
@@ -8,18 +7,18 @@
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro.server.api-middleware :as fmw]))
 
-(defn find-user [email]
-  (crux/q (crux/db node)
+(defn find-user [db email]
+  (crux/q db
     `{:find [e]
       :where [[e :account/email ~email]]}))
 
-(defn get-user [email]
-  (crux/entity (crux/db node) (first (first (find-user email)))))
+(defn get-user [db email]
+  (crux/entity db (first (first (find-user db email)))))
 
-(defn create-user [email password]
+(defn create-user [crux-node email password]
   (let [password-hash (hashers/derive password)]
     (crux/submit-tx
-      node
+      crux-node
       [[:crux.tx/put
         {:crux.db/id (keyword "account.id" (str (util/uuid)))
          :account/email email
@@ -35,10 +34,10 @@
         (let [new-session (merge existing-session mutation-response)]
           (assoc resp :session new-session))))))
 
-(defmutation login [env {:keys [username password]}]
+(defmutation login [{:keys [db] :as env} {:keys [username password]}]
   {::pc/output [:session/valid? :account/name]}
   (log/info "Authenticating" username)
-  (let [user (get-user username)
+  (let [user (get-user db username)
         password-hash (:account/password-hash user)
         credentials-valid? (hashers/check password password-hash)]
     (if credentials-valid?
@@ -54,10 +53,10 @@
   {::pc/output [:session/valid?]}
   (response-updating-session env {:session/valid? false :account/name ""}))
 
-(defmutation signup! [env {:keys [email password]}]
+(defmutation signup! [{:keys [db crux-node]} {:keys [email password]}]
   {::pc/output [:signup/result]}
-  (if (empty? (find-user email))
+  (if (empty? (find-user db email))
     (do
-      (create-user email password)
+      (create-user crux-node email password)
       {:signup/result "OK"})
     (throw (ex-info "Email is taken" {:email email}))))
