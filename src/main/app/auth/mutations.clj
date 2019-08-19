@@ -1,6 +1,6 @@
 (ns app.auth.mutations
   (:require
-    [app.model.database :refer [node]]
+    [app.database.crux :refer [node]]
     [app.util :as util]
     [crux.api :as crux]
     [buddy.hashers :as hashers]

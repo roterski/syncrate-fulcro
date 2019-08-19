@@ -5,7 +5,7 @@
     [app.util :refer [uuid]]
     [clojure.test :refer [deftest is]]
     [fulcro-spec.core :refer [specification provided behavior assertions component provided!]]
-    [app.model.mock-database :as db]
+    [app.database.datascript :as db]
     [datascript.core :as d]
     [taoensso.timbre :as log]))
 

@@ -1,6 +1,6 @@
 (ns app.posts.mutations
   (:require
-    [app.model.database :refer [node get-entities]]
+    [app.database.crux :refer [node get-entities]]
     [app.auth.resolvers :as auth]
     [app.util :as util]
     [crux.api :as crux]

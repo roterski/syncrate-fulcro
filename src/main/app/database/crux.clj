@@ -1,4 +1,4 @@
-(ns app.model.database
+(ns app.database.crux
   (:require [crux.api :as crux]
             [crux.kafka.embedded :as ek]
             [mount.core :refer [defstate]])

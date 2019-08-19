@@ -1,7 +1,7 @@
 (ns app.posts.resolvers
   (:require
     [app.posts.mutations :refer [create-post!]]
-    [app.model.database :refer [node get-entities]]
+    [app.database.crux :refer [node get-entities]]
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 

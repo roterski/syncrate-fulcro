@@ -10,7 +10,7 @@
     [app.auth.resolvers :as session]
     [app.posts.resolvers :as post]
     [app.server-components.config :refer [config]]
-    [app.model.mock-database :as db]))
+    [app.database.datascript :as db]))
 
 (pc/defresolver index-explorer [env _]
   {::pc/input  #{:com.wsscode.pathom.viz.index-explorer/id}

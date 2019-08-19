@@ -1,6 +1,6 @@
 (ns app.auth.account
   (:require
-    [app.model.mock-database :as db]
+    [app.database.datascript :as db]
     [datascript.core :as d]
     ;[ghostwheel.core :refer [>defn => | ?]]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]
