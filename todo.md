@@ -1,6 +1,7 @@
 ## TODO
 
 - [] url sync with router
+- [] fix controlled input error
 
 ### POSTS
 - [] post show
