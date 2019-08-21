@@ -28,10 +28,28 @@
   (get-entities `{:find [?e]
                   :where [[?e :profile/account ~account-id]]}))
 
+; ----------
+;  TEMP
+(defn make-comment
+  [id body children]
+  (cond-> {:comment/id id :comment/body body}
+    children (assoc :comment/children children)))
+
+(def fake-comments
+  (make-comment 1 "Server says Hi"
+                [(make-comment 3 "Hey" [(make-comment 4 "Aloha" [(make-comment 5 "halko" [])])
+                                        (make-comment 6 "elko" [])
+                                        (make-comment 7 "bobb" [])])
+                 (make-comment 8 "robb" [])
+                 (make-comment 9 "Hesooy" [])]))
+; TEMP
+; ----------
+
 (defresolver post-resolver [{:keys [db]} {:post/keys [id]}]
   {::pc/input #{:post/id}
-   ::pc/output [:post/title :post/body :post/author]}
-  (crux/entity db id))
+   ::pc/output [:post/title :post/body :post/author :post/comments]}
+  (merge (crux/entity db id)
+    {:post/comments fake-comments}))
 
 (defresolver profile-resolver [{:keys [db]} {:profile/keys [id]}]
   {::pc/input #{:profile/id}

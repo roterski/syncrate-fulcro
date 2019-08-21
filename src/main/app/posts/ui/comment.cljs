@@ -4,19 +4,20 @@
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.components :as comp]))
 
-
 (declare ui-comment)
 
-(defsc Comment [this {:keys [:db/id :comment/body :comment/children]}]
-  {:query (fn [] [:db/id :comment/body {:comment/children '...}])
-   :ident [:comment/id :db/id]}
+(defsc Comment [this {:keys [:comment/body :comment/children]}]
+  {:query (fn [] [:comment/id :comment/body
+                  {:comment/children '...}
+                  ])
+   :ident :comment/id}
   (div :.ui.container.segment
     body
-    (when (seq children)
-      (div
-          (dom/ul
-            (map (fn [p]
-                  (ui-comment p))
-                children))))))
+      (when (seq children)
+        (div
+        (dom/ul
+          (map
+           (fn [p] (ui-comment p))
+           children))))))
 
-(def ui-comment (comp/factory Comment {:keyfn :db/id}))
+(def ui-comment (comp/factory Comment {:keyfn :comment/id}))
