@@ -12,25 +12,9 @@
    [taoensso.timbre :as log]
    [com.fulcrologic.fulcro-css.css :as css]))
 
-
-; (defn make-comment
-;   [id body children]
-;   (cond-> {:comment/id id :comment/body body}
-;     children (assoc :comment/children children)))
-
-; (def fake-comments
-;   (make-comment 1 "Hello"
-;                 [(make-comment 3 "Hey" [(make-comment 4 "Aloha" [(make-comment 5 "halko" [])])
-;                                         (make-comment 6 "elko" [])
-;                                         (make-comment 7 "bobb" [])])
-;                  (make-comment 8 "robb" [])
-;                  (make-comment 9 "Hesooy" [])])
-;   )
-
 (defsc PostShow [this {:post/keys [id title body author comments] :as post}]
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
-           {:post/comments (comp/get-query Comment)}
-           ]
+           {:post/comments (comp/get-query Comment)}]
    :ident :post/id
    :route-segment ["post-show" :post/id]
   ;  :will-enter (fn [_ {:post/keys [id]}] (dr/route-immediate [:post/id (keyword id)]))}
@@ -44,6 +28,5 @@
     (h1 "Post")
     (ui-post post)
     (h2 "Comments")
-    ; (ui-comment fake-comments)
     (ui-comment comments)
     ))
