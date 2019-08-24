@@ -28,6 +28,6 @@
   (div :.ui.container.segment
     (h1 "Post")
     (ui-post post)
-    (ui-comment-form {} {:post-id id})
+    (ui-comment-form {} {:post-id id :parent-id nil})
     (h2 "Comments")
     (map ui-comment comments)))

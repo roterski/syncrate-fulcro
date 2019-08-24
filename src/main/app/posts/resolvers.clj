@@ -31,16 +31,22 @@
 (defresolver post-resolver [{:keys [db]} {:post/keys [id]}]
   {::pc/input #{:post/id}
    ::pc/output [:post/title :post/body :post/author :post/comments]}
-  (let [comment-query `{:find [?e]
-                        :where [[?e :comment/post-id id]]}
+  (let [comment-query {:find '[?e]
+                       :where '[[?e :comment/parent-id parent-id]
+                                [?e :comment/post-id post-id]]
+                       :args [{'parent-id nil
+                               'post-id id}]}
         comment-ids (mapv (fn [id] {:comment/id (first id)}) (crux/q db comment-query))]
     (merge (crux/entity db id)
       {:post/comments comment-ids})))
 
 (defresolver comment-resolver [{:keys [db]} {:comment/keys [id]}]
   {::pc/input #{:comment/id}
-   ::pc/output [:comment/body :comment/children]}
-  (merge (crux/entity db id) {:comment/children []}))
+   ::pc/output [:comment/body :comment/post-id :comment/parent-id :comment/children]}
+  (let [children-query `{:find [?e]
+                         :where [[?e :comment/parent-id ~id]]}
+        children (mapv (fn [id] {:comment/id (first id)}) (crux/q db children-query))]
+    (merge (crux/entity db id) {:comment/children children})))
 
 (defresolver profile-resolver [{:keys [db]} {:profile/keys [id]}]
   {::pc/input #{:profile/id}

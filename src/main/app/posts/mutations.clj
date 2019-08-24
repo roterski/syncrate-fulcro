@@ -38,7 +38,7 @@
       (create-post crux-node title body account-id)
       (throw (ex-info "Unauthorized" {:status-code 403 :message "not authenticated"})))))
 
-(defn create-comment [crux-node body post-id account-id]
+(defn create-comment [crux-node body post-id parent-id account-id]
   (let [comment-id (keyword "comment.id" (str (util/uuid)))]
     (do
       (crux/submit-tx
@@ -47,14 +47,15 @@
           {:crux.db/id comment-id
            :comment/body body
            :comment/post-id post-id
+           :comment/parent-id parent-id
            :comment/account-id account-id}]])
       comment-id)))
 
-(defmutation create-comment! [{:keys [crux-node] :as env} {:keys [body post-id]}]
+(defmutation create-comment! [{:keys [crux-node] :as env} {:keys [body post-id parent-id]}]
   {::pc/sym `create-comment!
-   ::pc/input #{:comment/body :comment/post-id}
+   ::pc/input #{:comment/body :comment/post-id :comment/parent-id}
    ::pc/output [:comment/id]}
   (let [account-id (get-in env [:ring/request :session :account/id])]
     (if account-id
-      (create-comment crux-node body post-id account-id)
+      (create-comment crux-node body post-id parent-id account-id)
       (throw (ex-info "Unauthorized" {:status-code 403 :message "not authenticated"})))))

@@ -13,7 +13,7 @@
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
 
-(defsc CommentForm [this {:comment/keys [id body] :as props} {:keys [post-id]}]
+(defsc CommentForm [this {:comment/keys [id body] :as props} {:keys [post-id parent-id]}]
   {:query             [:comment/id :comment/body fs/form-config-join]
    :initial-state     (fn [_]
                         (fs/add-form-config CommentForm
@@ -24,7 +24,7 @@
                         (comp/transact! this [(pm/clear-comment-form)]))}
   (let [submit!  (fn [evt]
                    (when (or (identical? true evt) (evt/enter-key? evt))
-                     (comp/transact! this [(pm/create-comment! {:body body :post-id post-id})])
+                     (comp/transact! this [(pm/create-comment! {:body body :post-id post-id :parent-id parent-id})])
                      (log/info "Create comment")))
         checked? (fs/checked? props)]
     (div
