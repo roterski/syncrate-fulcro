@@ -3,6 +3,7 @@
    [app.posts.ui.post :refer [Post ui-post]]
    [app.posts.ui.profile :refer [Profile]]
    [app.posts.ui.comment :refer [ui-comment Comment]]
+   [app.posts.ui.comment-form :refer [ui-comment-form]]
    [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2]]
    [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
    [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
@@ -27,6 +28,6 @@
   (div :.ui.container.segment
     (h1 "Post")
     (ui-post post)
+    (ui-comment-form {} {:post-id id})
     (h2 "Comments")
-    (ui-comment comments)
-    ))
+    (map ui-comment comments)))

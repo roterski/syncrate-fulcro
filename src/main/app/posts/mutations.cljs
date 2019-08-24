@@ -32,7 +32,7 @@
 (defn clear-comment-form*
   [state-map]
   (-> state-map
-      (assoc-in comment-form-ident {:comment/body ""})
+      (assoc-in (conj comment-form-ident :comment/body) "")
       (fs/add-form-config* (comment-form-class) comment-form-ident)))
 
 (defmutation clear-comment-form [_]

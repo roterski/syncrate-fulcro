@@ -46,7 +46,8 @@
         [[:crux.tx/put
           {:crux.db/id comment-id
            :comment/body body
-           :comment/post-id post-id}]])
+           :comment/post-id post-id
+           :comment/account-id account-id}]])
       comment-id)))
 
 (defmutation create-comment! [{:keys [crux-node] :as env} {:keys [body post-id]}]

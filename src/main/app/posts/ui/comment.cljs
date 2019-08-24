@@ -8,16 +8,15 @@
 
 (defsc Comment [this {:keys [:comment/body :comment/children]}]
   {:query (fn [] [:comment/id :comment/body
-                  {:comment/children '...}
-                  ])
+                  {:comment/children '...}])
    :ident :comment/id}
   (div :.ui.container.segment
     body
       (when (seq children)
         (div
-        (dom/ul
-          (map
-           (fn [p] (ui-comment p))
-           children))))))
+          (dom/ul
+            (map
+             (fn [p] (ui-comment p))
+             children))))))
 
 (def ui-comment (comp/factory Comment {:keyfn :comment/id}))

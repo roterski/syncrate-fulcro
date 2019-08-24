@@ -36,6 +36,7 @@
               :onKeyDown     submit!
               :onChange      #(m/set-string! this :post/title :event %)})
       (field {:label         "Body"
+              :value         (or body "")
               :onKeyDown     submit!
               :autoComplete  "off"
               :onChange      #(m/set-string! this :post/body :event %)})
