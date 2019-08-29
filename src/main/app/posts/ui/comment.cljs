@@ -1,7 +1,9 @@
 (ns app.posts.ui.comment
   (:require
     [app.posts.ui.comment-form :refer [ui-comment-form]]
+    [app.posts.ui.new-comment-button :refer [ui-new-comment-button]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2]]
+    [com.fulcrologic.fulcro.algorithms.tempid :as tempid]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.components :as comp]))
 
@@ -11,14 +13,18 @@
   {:query (fn [] [:comment/id :comment/body :comment/post-id
                   {:comment/children '...}])
    :ident :comment/id}
-  (div :.ui.container.segment
-    body
-    (ui-comment-form {} {:post-id post-id :parent-id id})
-    (when (seq children)
-      (div
-        (dom/ul
-          (map
-           (fn [p] (ui-comment p))
-           children))))))
+  (let [filter-fn #(tempid/tempid? (:comment/id %))
+        new-comment (first (filter filter-fn children))
+        saved-children (filter (complement filter-fn) children)]
+    (div :.ui.container.segment
+      body
+      (when (not (tempid/tempid? id))
+        (ui-new-comment-button this new-comment post-id id))
+      (when (seq saved-children)
+        (div
+          (dom/ul
+            (map
+             (fn [p] (ui-comment p))
+             saved-children)))))))
 
 (def ui-comment (comp/factory Comment {:keyfn :comment/id}))
