@@ -31,11 +31,26 @@
 (defmutation add-comment
   [{:keys [post-id parent-id]}]
   (action [{:keys [state]}]
-          (let [comment-id (tempid)]
-            (swap! state (fn [s]
-                           (-> s
-                               (add-comment* {:id comment-id :body "" :post-id post-id :parent-id parent-id})
-                               (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
+    (let [comment-id (tempid)]
+      (swap! state (fn [s]
+                     (-> s
+                         (add-comment* {:id comment-id :body "" :post-id post-id :parent-id parent-id})
+                         (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
+
+(defn remove-comment*
+  [state-map {:keys [id post-id parent-id]}]
+  (let [remove-fn (fn [c] (vec (remove #(= id (second %)) c)))]
+    (cond-> state-map
+      true (update-in [:comment/id] dissoc id)
+      (some? post-id) (update-in [:post/id post-id :post/comments] remove-fn)
+      (some? parent-id) (update-in [:comment/id parent-id :comment/children] remove-fn))))
+
+(defmutation remove-comment
+  [props]
+  (action [{:keys [state]}]
+    (swap! state (fn [s]
+                   (-> s
+                       (remove-comment* props))))))
 
 (defsc CommentForm [this {:comment/keys [id body] :as props} {:keys [post-id parent-id]}]
   {:query             [:comment/id :comment/body fs/form-config-join]
@@ -43,9 +58,9 @@
    ;                     (fs/add-form-config CommentForm
    ;                       {:comment/body  ""}))
    :form-fields       #{:comment/body}
-   :ident             :comment/id
-   :componentDidMount (fn [this]
-                        (comp/transact! this [(pm/clear-comment-form)]))}
+   :ident             :comment/id}
+   ;:componentDidMount (fn [this]
+   ;                     (comp/transact! this [(pm/clear-comment-form)]))}
   (let [submit!  (fn [evt]
                    (when (or (identical? true evt) (evt/enter-key? evt))
                      (comp/transact! this [(pm/create-comment! {:body body :post-id post-id :parent-id parent-id})])
@@ -60,6 +75,7 @@
                 :autoComplete  "off"
                 :onChange      #(m/set-string! this :comment/body :event %)})
         (dom/button :.ui.primary.button {:onClick #(submit! true)}
-          "Create")))))
+          "Create")
+        (dom/button :.ui.secondary.button {:onClick #(comp/transact! this `[(remove-comment {:id ~id :post-id ~post-id :parent-id ~parent-id})])} "Cancel")))))
 
 (def ui-comment-form (comp/computed-factory CommentForm {:keyfn :comment/id}))

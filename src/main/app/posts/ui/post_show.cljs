@@ -36,21 +36,16 @@
     (div :.ui.container.segment
       (h1 "Post")
       (ui-post post)
-      ;(if (empty? new-comment)
-      ;  (button :.ui.button {:onClick #(comp/transact! this `[(add-comment {:post-id ~id})])} "Add comment")
-      ;  (ui-comment-form new-comment {:post-id id}))
-
       (ui-new-comment-button this new-comment id nil)
-
-      ;(ui-comment-form {} {:post-id id :parent-id nil})
       (h2 "Comments")
       (map ui-comment saved-comments))))
+
 
 
 (comment
   (let [state (app/current-state SPA)
         query (comp/get-query PostShow)
-        post-id "277b7340-dda5-4c22-89f4-80c22a5e0563"
+        post-id "5f7133f2-8701-46b6-9d30-a4f08e7f2e58"
         ident [:post/id (keyword "post.id" post-id)]
         post (dn/db->tree query ident state)
         comments (:post/comments post)
@@ -59,5 +54,5 @@
         temp-comments (filter filter-fn comments)
         temp-comment (first (filter filter-fn comments))
         saved-comments (filter (fn [comment] (not (filter-fn comment))) comments)]
-    temp-comments))
+    (def st post)))
 
