@@ -63,7 +63,7 @@
    ;                     (comp/transact! this [(pm/clear-comment-form)]))}
   (let [submit!  (fn [evt]
                    (when (or (identical? true evt) (evt/enter-key? evt))
-                     (comp/transact! this [(pm/create-comment! {:body body :post-id post-id :parent-id parent-id})])
+                     (comp/transact! this [(pm/create-comment! {:tempid id :body body :post-id post-id :parent-id parent-id})])
                      (log/info "Create comment")))
         checked? (fs/checked? props)]
     (div

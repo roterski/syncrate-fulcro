@@ -51,11 +51,11 @@
            :comment/account-id account-id}]])
       comment-id)))
 
-(defmutation create-comment! [{:keys [crux-node] :as env} {:keys [body post-id parent-id]}]
+(defmutation create-comment! [{:keys [crux-node] :as env} {:keys [tempid body post-id parent-id]}]
   {::pc/sym `create-comment!
    ::pc/input #{:comment/body :comment/post-id :comment/parent-id}
    ::pc/output [:comment/id]}
   (let [account-id (get-in env [:ring/request :session :account/id])]
     (if account-id
-      (create-comment crux-node body post-id parent-id account-id)
+      {:tempids {tempid (create-comment crux-node body post-id parent-id account-id)}}
       (throw (ex-info "Unauthorized" {:status-code 403 :message "not authenticated"})))))

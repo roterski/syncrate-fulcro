@@ -39,10 +39,10 @@
   (action [{:keys [state]}]
     (swap! state clear-comment-form*)))
 
-(defmutation create-comment! [_]
+(defmutation create-comment! [{:keys [tempid]}]
   (action [{:keys [state]}]
     (log/info "Marking comment complete")
-    (swap! state fs/mark-complete* comment-form-ident))
+    (swap! state fs/mark-complete* [:comment/id tempid]))
   (error-action [env]
     (log/error "Comment creating failed")
     (log/error env))
