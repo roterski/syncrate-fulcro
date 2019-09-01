@@ -45,12 +45,19 @@
       (some? post-id) (update-in [:post/id post-id :post/comments] remove-fn)
       (some? parent-id) (update-in [:comment/id parent-id :comment/children] remove-fn))))
 
+(defn remove-comment-form*
+  [state-map {:keys [id]}]
+  (let [form-id {:table :comment/id, :row id}]
+    (-> state-map
+      (update-in [::fs/forms-by-ident] dissoc form-id))))
+
 (defmutation remove-comment
   [props]
   (action [{:keys [state]}]
     (swap! state (fn [s]
                    (-> s
-                       (remove-comment* props))))))
+                       (remove-comment* props)
+                       (remove-comment-form* props))))))
 
 (defsc CommentForm [this {:comment/keys [id body] :as props} {:keys [post-id parent-id]}]
   {:query             [:comment/id :comment/body fs/form-config-join]
