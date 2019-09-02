@@ -52,7 +52,7 @@
       comment-id)))
 
 (defmutation create-comment! [{:keys [crux-node] :as env} {:keys [tempid body post-id parent-id]}]
-  {::pc/sym `create-comment!
+  {::pc/sym 'app.posts.ui.comment-form/create-comment!
    ::pc/input #{:comment/body :comment/post-id :comment/parent-id}
    ::pc/output [:comment/id]}
   (let [account-id (get-in env [:ring/request :session :account/id])]

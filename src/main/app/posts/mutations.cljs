@@ -29,21 +29,3 @@
     (log/error env))
   (remote [{:keys [state] :as env}] true))
 
-(defn clear-comment-form*
-  [state-map]
-  (-> state-map
-      (assoc-in (conj comment-form-ident :comment/body) "")
-      (fs/add-form-config* (comment-form-class) comment-form-ident)))
-
-(defmutation clear-comment-form [_]
-  (action [{:keys [state]}]
-    (swap! state clear-comment-form*)))
-
-(defmutation create-comment! [{:keys [tempid]}]
-  (action [{:keys [state]}]
-    (log/info "Marking comment complete")
-    (swap! state fs/mark-complete* [:comment/id tempid]))
-  (error-action [env]
-    (log/error "Comment creating failed")
-    (log/error env))
-  (remote [{:keys [state] :as env}] true))
