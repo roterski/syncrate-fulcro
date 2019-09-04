@@ -39,7 +39,7 @@
                          (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
 
 (defn remove-comment*
-  [state-map {:keys [id post-id parent-id]}]
+  [state-map {:comment/keys [id post-id parent-id]}]
   (let [remove-fn (fn [c] (vec (remove #(= id (second %)) c)))]
     (cond-> state-map
       true (update-in [:comment/id] dissoc id)
@@ -47,7 +47,7 @@
       (some? parent-id) (update-in [:comment/id parent-id :comment/children] remove-fn))))
 
 (defn remove-comment-form*
-  [state-map {:keys [id]}]
+  [state-map {:comment/keys [id]}]
   (let [form-id {:table :comment/id, :row id}]
     (-> state-map
       (update-in [::fs/forms-by-ident] dissoc form-id))))
@@ -60,7 +60,7 @@
                        (remove-comment* props)
                        (remove-comment-form* props))))))
 
-(defmutation create-comment! [{:keys [tempid] :as props}]
+(defmutation create-comment! [{:comment/keys [tempid]}]
   (action [{:keys [state]}]
     (log/info "Creating comment..."))
   (ok-action [{:keys [state result] :as env}]
@@ -89,8 +89,8 @@
                    (when (or (identical? true evt) (evt/enter-key? evt))
                      (comp/transact! this `[(fs/mark-complete! {:field :comment/body})])
                      (when (contains? #{:valid} validity)
-                       (comp/transact! this [(create-comment! {:tempid id :body body :post-id post-id :parent-id parent-id})]))))
-        cancel  #(comp/transact! this `[(remove-comment {:id ~id :post-id ~post-id :parent-id ~parent-id})])]
+                       (comp/transact! this `[(create-comment! {:comment/tempid ~id :comment/body ~body :comment/post-id ~post-id :comment/parent-id ~parent-id})]))))
+        cancel  #(comp/transact! this `[(remove-comment {:comment/id ~id :comment/post-id ~post-id :comment/parent-id ~parent-id})])]
     (div
       (div :.ui.form {:classes [(when (contains? #{:invalid} (fs/get-spec-validity props)) "error")]}
         (field {:label         "New Comment"

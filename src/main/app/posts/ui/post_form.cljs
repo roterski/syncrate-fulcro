@@ -1,8 +1,10 @@
 (ns app.posts.ui.post-form
   (:require
+    [cljs.spec.alpha :as s]
     [app.posts.mutations :as post]
     [app.posts.helpers :refer [post-form-ident]]
     [app.ui.components :refer [field]]
+    [clojure.set :refer [intersection subset?]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
@@ -11,6 +13,7 @@
     [com.fulcrologic.fulcro.algorithms.tempid :refer [tempid]]
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro-css.css :as css]
+    [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
 
 (declare PostForm)
@@ -49,6 +52,25 @@
                    (-> s
                        (clear-post-form* id))))))
 
+(defmutation create-post! [{:keys [tempid]}]
+  (action [{:keys [state]}]
+    (log/info "Creating post..."))
+  (ok-action [{:keys [app state] :as params}]
+    (log/info "...post created successfully!")
+    (swap! state (fn [s]
+                   (-> s
+                       (clear-post-form* tempid))))
+    (dr/change-route app ["post-list" "all-posts"]))
+  (error-action [env]
+    (log/error "...creating post failed!")
+    (log/error env))
+  (remote [{:keys [state] :as env}] true))
+
+(s/def :post/title #(<= 3 (count %)))
+(s/def :post/body #(< 0 (count %)))
+
+(def not-empty? (complement empty?))
+
 (defsc PostForm [this {:post/keys [id title body] :as props}]
   {:query             [:post/id :post/title :post/body fs/form-config-join]
    :initial-state     (fn [_]
@@ -57,31 +79,37 @@
                            :post/body  ""}))
    :form-fields       #{:post/title :post/body}
    :ident             :post/id}
-  (let [submit!  (fn [evt]
+  (let [title-validity (fs/get-spec-validity props :post/title)
+        body-validity (fs/get-spec-validity props :post/body)
+        validity (conj #{} title-validity body-validity)
+        submit!  (fn [evt]
                    (when (or (identical? true evt) (evt/enter-key? evt))
-                     (comp/transact! this [(post/create-post! {:title title :body body})])
-                     (log/info "Create post")))
-        cancel #(comp/transact! this [(clear-post-form {:id id})])
-        checked? (log/spy :info (fs/checked? props))
-        complete! (fn []
-                    (do
-                      (log/info "Completing post!")
-                      (comp/transact! this `[(fs/mark-complete! {:field :post/title})])))]
-    (div :.ui.form {:classes [(when checked? "error")]}
+                     (comp/transact! this `[(fs/mark-complete! {})])
+                     (when (= #{:valid} validity)
+                       (comp/transact! this `[(create-post! {:post/tempid ~id :post/title ~title :post/body ~body})]))))
+        cancel #(comp/transact! this [(clear-post-form {:id id})])]
+    (div :.ui.form {:classes [(when (subset? #{:invalid} validity) "error")]}
       (field {:label         "Title"
               :value         (or title "")
-              :valid?        (>= 3 (count title))
+              :valid?        (contains? #{:valid :unchecked} title-validity)
               :error-message "Must be at least 3 char long"
               :autoComplete  "off"
               :onBlur        #(comp/transact! this `[(fs/mark-complete! {:field :post/title})])
               :onKeyDown     submit!
-              :onChange      #(m/set-string! this :post/title :event %)})
+              :onChange      #(do
+                                (m/set-string! this :post/title :event %))})
       (field {:label         "Body"
               :value         (or body "")
+              :valid?        (contains? #{:valid :unchecked} body-validity)
+              :error-message "Cannot be blank"
               :onKeyDown     submit!
               :autoComplete  "off"
-              :onChange      #(m/set-string! this :post/body :event %)})
-      (dom/button :.ui.primary.button {:onClick #(submit! true)}
+              :onChange      #(do
+                                (comp/transact! this `[(fs/mark-complete! {:field :post/body})])
+                                (m/set-string! this :post/body :event %))})
+      (dom/button :.ui.primary.button {:onClick #(submit! true) :disabled (->> validity
+                                                                               (intersection #{:invalid :unchecked})
+                                                                               not-empty?)}
         "Create")
       (dom/button :.ui.secondary.button {:onClick cancel} "Cancel"))))
 
