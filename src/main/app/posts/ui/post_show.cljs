@@ -8,7 +8,7 @@
    [com.fulcrologic.fulcro.algorithms.tempid :as tempid]
    [app.posts.ui.profile :refer [Profile]]
    [app.posts.ui.comment :refer [ui-comment Comment]]
-   [app.posts.ui.comment-form :refer [ui-comment-form add-comment]]
+   [app.posts.ui.comment-form :refer [ui-comment-form]]
    [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2 button]]
    [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
    [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
@@ -54,5 +54,5 @@
         temp-comments (filter filter-fn comments)
         temp-comment (first (filter filter-fn comments))
         saved-comments (filter (fn [comment] (not (filter-fn comment))) comments)]
-    (def st post)))
+    (def st state)))
 

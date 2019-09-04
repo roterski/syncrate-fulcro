@@ -18,15 +18,25 @@
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]))
 
 (defn add-comment*
-  [state-map {:keys [id body post-id parent-id]}]
+  [state-map {:comment/keys [id post-id parent-id] :as props}]
   (let [comment-ident [:comment/id id]
-        new-comment-entity {:comment/id id :comment/body body :comment/post-id post-id :comment/parent-id parent-id}
         parent-ident (if (nil? parent-id)
                        [:post/id post-id :post/comments]
                        [:comment/id parent-id :comment/children])]
     (-> state-map
         (update-in parent-ident (fnil conj []) comment-ident)
-        (assoc-in comment-ident new-comment-entity))))
+        (assoc-in comment-ident props))))
+
+(declare CommentForm)
+
+(defmutation add-comment-form
+  [props]
+  (action [{:keys [state]}]
+    (let [comment-id (tempid)]
+      (swap! state (fn [s]
+                     (-> s
+                         (add-comment* (merge {:comment/id comment-id :comment/body ""} props))
+                         (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
 
 (defn remove-comment*
   [state-map {:keys [id post-id parent-id]}]
@@ -41,17 +51,6 @@
   (let [form-id {:table :comment/id, :row id}]
     (-> state-map
       (update-in [::fs/forms-by-ident] dissoc form-id))))
-
-(declare CommentForm)
-
-(defmutation add-comment
-  [{:keys [post-id parent-id] :as props}]
-  (action [{:keys [state]}]
-    (let [comment-id (tempid)]
-      (swap! state (fn [s]
-                     (-> s
-                         (add-comment* {:id comment-id :body "" :post-id post-id :parent-id parent-id})
-                         (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
 
 (defmutation remove-comment
   [props]
