@@ -5,7 +5,9 @@
     [app.auth.ui.signup :refer [Signup]]
     [app.auth.ui.signup-success :refer [SignupSuccess]]
     [app.posts.ui.post-form :refer [PostForm]]
+    [app.posts.ui.new-post-page :refer [NewPostPage]]
     [app.posts.ui.post-list :refer [PostList]]
+    [app.posts.ui.post-show :refer [PostShow]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
@@ -32,7 +34,7 @@
     (h3 "Settings")))
 
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess PostForm Settings PostList]})
+  {:router-targets [Main Signup SignupSuccess NewPostPage Settings PostList PostShow]})
 
 (def ui-top-router (comp/factory TopRouter))
 
