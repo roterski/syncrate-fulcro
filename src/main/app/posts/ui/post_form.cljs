@@ -2,6 +2,7 @@
   (:require
     [cljs.spec.alpha :as s]
     [app.posts.mutations :as post]
+    [app.posts.validations]
     [app.posts.helpers :refer [post-form-ident]]
     [app.ui.components :refer [field]]
     [clojure.set :refer [intersection subset?]]
@@ -52,22 +53,20 @@
                    (-> s
                        (clear-post-form* id))))))
 
-(defmutation create-post! [{:keys [tempid]}]
+(defmutation create-post! [{:post/keys [tempid]}]
   (action [{:keys [state]}]
     (log/info "Creating post..."))
-  (ok-action [{:keys [app state] :as params}]
+  (ok-action [{:keys [app state result] :as params}]
     (log/info "...post created successfully!")
     (swap! state (fn [s]
                    (-> s
-                       (clear-post-form* tempid))))
+                       (update-in [::fs/forms-by-ident] dissoc {:table :post/id :row tempid})
+                       (assoc-in [:component/id :new-post-page :new-post-page/post] nil))))
     (dr/change-route app ["post-list" "all-posts"]))
   (error-action [env]
     (log/error "...creating post failed!")
     (log/error env))
   (remote [{:keys [state] :as env}] true))
-
-(s/def :post/title #(<= 3 (count %)))
-(s/def :post/body #(< 0 (count %)))
 
 (def not-empty? (complement empty?))
 

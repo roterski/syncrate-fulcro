@@ -73,8 +73,6 @@
     (log/error env))
   (remote [{:keys [state] :as env}] true))
 
-(s/def :comment/body #(< 0 (count %)))
-
 (defsc CommentForm [this {:comment/keys [id body] :as props} {:keys [post-id parent-id]}]
   {:query             [:comment/id :comment/body fs/form-config-join]
    :form-fields       #{:comment/body}
