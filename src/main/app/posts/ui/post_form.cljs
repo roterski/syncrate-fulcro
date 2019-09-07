@@ -1,6 +1,5 @@
 (ns app.posts.ui.post-form
   (:require
-    [app.posts.mutations :as post]
     [app.posts.validations]
     [app.ui.components :refer [field]]
     [clojure.set :refer [intersection subset?]]

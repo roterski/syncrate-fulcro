@@ -1,4 +1,4 @@
-(ns app.posts.ui.post-show
+(ns app.posts.ui.post-show-page
   (:require
    [app.posts.ui.post :refer [Post ui-post]]
    [app.profiles.ui.profile :refer [Profile]]
@@ -18,7 +18,7 @@
    [taoensso.timbre :as log]
    [com.fulcrologic.fulcro-css.css :as css]))
 
-(defsc PostShow [this {:post/keys [id title body author comments] :as post}]
+(defsc PostShowPage [this {:post/keys [id title body author comments] :as post}]
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}]
    :ident :post/id
@@ -27,7 +27,7 @@
    :will-enter (fn [app {:post/keys [id]}]
                  (let [id (keyword id)]
                    (dr/route-deferred [:post/id id]
-                                      #(df/load app [:post/id id] PostShow
+                                      #(df/load app [:post/id id] PostShowPage
                                                 {:post-mutation `dr/target-ready
                                                  :post-mutation-params {:target [:post/id id]}}))))}
   (let [filter-fn #(tempid/tempid? (:comment/id %))
