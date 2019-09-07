@@ -3,7 +3,6 @@
     [app.posts.mutations :as pm]
     [cljs.spec.alpha :as s]
     [goog.object :as gobj]
-    [app.posts.helpers :refer [comment-form-ident]]
     [app.ui.components :refer [field]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
