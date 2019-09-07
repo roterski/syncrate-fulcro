@@ -1,4 +1,4 @@
-(ns app.posts.ui.profile
+(ns app.profiles.ui.profile
   (:require [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
             [com.fulcrologic.fulcro.components :as comp]
             [com.fulcrologic.fulcro.dom :as dom :refer [div]]))

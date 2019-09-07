@@ -6,8 +6,8 @@
     [app.auth.ui.signup-success :refer [SignupSuccess]]
     [app.posts.ui.post-form :refer [PostForm]]
     [app.posts.ui.new-post-page :refer [NewPostPage]]
-    [app.posts.ui.post-list :refer [PostList]]
-    [app.posts.ui.post-show :refer [PostShow]]
+    [app.posts.ui.post-list-page :refer [PostListPage]]
+    [app.posts.ui.post-show-page :refer [PostShowPage]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
@@ -34,7 +34,7 @@
     (h3 "Settings")))
 
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Signup SignupSuccess NewPostPage Settings PostList PostShow]})
+  {:router-targets [Main Settings Signup SignupSuccess NewPostPage PostListPage PostShowPage]})
 
 (def ui-top-router (comp/factory TopRouter))
 
@@ -55,10 +55,10 @@
                        :onClick (fn [] (dr/change-route this ["main"]))} "Main")
         (when (:session/valid? current-session)
           (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
-                        :onClick (fn [] (dr/change-route this ["settings"]))} "Settings"))
+                         :onClick (fn [] (dr/change-route this ["settings"]))} "Settings"))
         (when (:session/valid? current-session)
           (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
-                        :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post"))
+                         :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post"))
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
                        :onClick (fn [] (dr/change-route this ["post-list" "all-posts"]))} "Posts")
         (div :.right.menu

@@ -1,7 +1,7 @@
-(ns app.posts.ui.comment
+(ns app.comments.ui.comment
   (:require
-    [app.posts.ui.comment-form :refer [ui-comment-form]]
-    [app.posts.ui.new-comment-button :refer [ui-new-comment-button]]
+    [app.comments.ui.comment-form :refer [ui-comment-form]]
+    [app.comments.ui.new-comment-button :refer [ui-new-comment-button]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2]]
     [com.fulcrologic.fulcro.algorithms.tempid :as tempid]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]

@@ -1,4 +1,4 @@
-(ns app.posts.ui.post-list
+(ns app.posts.ui.post-list-page
   (:require
     [app.posts.ui.post :refer [Post ui-post]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
@@ -10,7 +10,7 @@
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro-css.css :as css]))
 
-(defsc PostList [this {:post-list/keys [id label posts] :as props}]
+(defsc PostListPage [this {:post-list/keys [id label posts] :as props}]
   {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}]
    :ident :post-list/id
    :route-segment ["post-list" :post-list/id]
@@ -18,7 +18,7 @@
    :will-enter (fn [app {:post-list/keys [id]}]
                  (let [id (keyword id)]
                    (dr/route-deferred [:post-list/id id]
-                      #(df/load app [:post-list/id id] PostList
+                      #(df/load app [:post-list/id id] PostListPage
                                 {:post-mutation `dr/target-ready
                                  :post-mutation-params {:target [:post-list/id id]}}))))}
   (div :.ui.container.segment

@@ -1,9 +1,6 @@
 (ns app.posts.ui.post-form
   (:require
-    [cljs.spec.alpha :as s]
-    [app.posts.mutations :as post]
     [app.posts.validations]
-    [app.posts.helpers :refer [post-form-ident]]
     [app.ui.components :refer [field]]
     [clojure.set :refer [intersection subset?]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
