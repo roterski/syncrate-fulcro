@@ -1,9 +1,8 @@
-(ns app.posts.ui.comment-form
+(ns app.comments.ui.comment-form
   (:require
-    [app.posts.mutations :as pm]
-    [cljs.spec.alpha :as s]
-    [goog.object :as gobj]
+    [app.comments.validations]
     [app.ui.components :refer [field]]
+    [goog.object :as gobj]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]

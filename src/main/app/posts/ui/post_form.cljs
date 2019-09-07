@@ -1,6 +1,5 @@
 (ns app.posts.ui.post-form
   (:require
-    [cljs.spec.alpha :as s]
     [app.posts.mutations :as post]
     [app.posts.validations]
     [app.ui.components :refer [field]]

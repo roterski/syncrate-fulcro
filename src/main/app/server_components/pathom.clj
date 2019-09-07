@@ -6,8 +6,10 @@
    [com.wsscode.pathom.core :as p]
    [com.wsscode.common.async-clj :refer [let-chan]]
    [clojure.core.async :as async]
-   [app.auth.resolvers :as session]
-   [app.posts.resolvers :as post]
+   [app.auth.resolvers :as auth]
+   [app.posts.resolvers :as posts]
+   [app.comments.resolvers :as comments]
+   [app.profiles.resolvers :as profiles]
    [app.server-components.config :refer [config]]
    [crux.api :as crux]
    [app.database.crux :refer [node]]))
@@ -20,7 +22,7 @@
      (update ::pc/index-resolvers #(into [] (map (fn [[k v]] [k (dissoc v ::pc/resolve)])) %))
      (update ::pc/index-mutations #(into [] (map (fn [[k v]] [k (dissoc v ::pc/mutate)])) %)))})
 
-(def all-resolvers [session/resolvers post/resolvers index-explorer])
+(def all-resolvers [auth/resolvers posts/resolvers comments/resolvers profiles/resolvers index-explorer])
 
 (defn preprocess-parser-plugin
   "Helper to create a plugin that can view/modify the env/tx of a top-level request.

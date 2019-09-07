@@ -1,7 +1,7 @@
 (ns app.posts.ui.post
   (:require
     [app.ui.components :refer [field]]
-    [app.posts.ui.profile :refer [Profile ui-profile]]
+    [app.profiles.ui.profile :refer [Profile ui-profile]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
