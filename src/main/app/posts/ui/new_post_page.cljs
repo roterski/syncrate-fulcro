@@ -12,8 +12,7 @@
 (defsc NewPostPage [this {:new-post-page/keys [post] :as props}]
    {:ident         (fn [] [:component/id :new-post-page])
     :query         [{:new-post-page/post (comp/get-query Post)}]
-    :route-segment ["new-post"]
-    :will-enter        (fn [app _] (dr/route-immediate [:component/id :new-post-page]))}
+    :route-segment ["new-post"]}
    (when-not post
      (comp/transact! this `[(add-post-form {})]))
    (div

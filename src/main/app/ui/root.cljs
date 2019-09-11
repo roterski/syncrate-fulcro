@@ -18,8 +18,7 @@
   {:query         [:main/welcome-message]
    :initial-state {:main/welcome-message "Hello world!"}
    :ident         (fn [] [:component/id :main])
-   :route-segment ["main"]
-   :will-enter    (fn [_ _] (dr/route-immediate [:component/id :main]))}
+   :route-segment ["main"]}
   (div :.ui.container.segment
     (h3 "Main")
     (p welcome-message)))
@@ -28,7 +27,6 @@
   {:query         [:account/time-zone :account/real-name]
    :ident         (fn [] [:component/id :settings])
    :route-segment ["settings"]
-   :will-enter    (fn [_ _] (dr/route-immediate [:component/id :settings]))
    :initial-state {}}
   (div :.ui.container.segment
     (h3 "Settings")))

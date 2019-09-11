@@ -16,16 +16,6 @@
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
 
-(defsc SignupSuccess [this props]
-  {:query         ['*]
-   :initial-state {}
-   :ident         (fn [] [:component/id :signup-success])
-   :route-segment ["signup-success"]
-   :will-enter    (fn [app _] (dr/route-immediate [:component/id :signup-success]))}
-  (div
-    (dom/h3 "Signup Complete!")
-    (dom/p "You can now log in!")))
-
 (defsc Signup [this {:account/keys [email password password-again] :as props}]
   {:query             [:account/email :account/password :account/password-again fs/form-config-join]
    :initial-state     (fn [_]
@@ -37,8 +27,7 @@
    :ident             (fn [] signup-ident)
    :route-segment     ["signup"]
    :componentDidMount (fn [this]
-                        (comp/transact! this [(clear-signup-form)]))
-   :will-enter        (fn [app _] (dr/route-immediate [:component/id :signup]))}
+                        (comp/transact! this [(clear-signup-form)]))}
   (let [submit!  (fn [evt]
                    (when (or (identical? true evt) (evt/enter-key? evt))
                      (comp/transact! this [(signup! {:email email :password password})])

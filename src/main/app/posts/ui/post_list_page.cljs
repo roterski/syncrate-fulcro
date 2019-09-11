@@ -14,7 +14,6 @@
   {:query [:post-list/id :post-list/label {:post-list/posts (comp/get-query Post)}]
    :ident :post-list/id
    :route-segment ["post-list" :post-list/id]
-   ;:will-enter (fn [_ {:post-list/keys [id]}] (dr/route-immediate [:post-list/id (keyword id)]))}
    :will-enter (fn [app {:post-list/keys [id]}]
                  (let [id (keyword id)]
                    (dr/route-deferred [:post-list/id id]
