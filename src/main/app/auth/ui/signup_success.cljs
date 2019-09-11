@@ -6,13 +6,11 @@
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]))
 
-
 (defsc SignupSuccess [this props]
   {:query         ['*]
    :initial-state {}
    :ident         (fn [] [:component/id :signup-success])
-   :route-segment ["signup-success"]
-   :will-enter    (fn [app _] (dr/route-immediate [:component/id :signup-success]))}
+   :route-segment ["signup-success"]}
   (div
     (dom/h3 "Signup Complete!")
     (dom/p "You can now log in!")))

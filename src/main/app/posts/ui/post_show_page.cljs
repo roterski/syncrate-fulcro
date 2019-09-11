@@ -23,7 +23,6 @@
            {:post/comments (comp/get-query Comment)}]
    :ident :post/id
    :route-segment ["post-show" :post/id]
-  ;  :will-enter (fn [_ {:post/keys [id]}] (dr/route-immediate [:post/id (keyword id)]))}
    :will-enter (fn [app {:post/keys [id]}]
                  (let [id (keyword id)]
                    (dr/route-deferred [:post/id id]
