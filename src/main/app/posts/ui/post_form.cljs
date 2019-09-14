@@ -59,7 +59,7 @@
                    (-> s
                        (update-in [::fs/forms-by-ident] dissoc {:table :post/id :row tempid})
                        (assoc-in [:component/id :new-post-page :new-post-page/post] nil))))
-    (dr/change-route app ["post-list" "all-posts"]))
+    (dr/change-route app ["post-list" "all-posts" "page" 1]))
   (error-action [env]
     (log/error "...creating post failed!")
     (log/error env))
