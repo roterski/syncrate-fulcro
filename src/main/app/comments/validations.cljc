@@ -3,7 +3,7 @@
     #?(:clj [clojure.spec.alpha :as s]
        :cljs [cljs.spec.alpha :as s])))
 
-(s/def :comment/body #(< 0 (count %)))
+(s/def :comment/body (s/and string? #(< 0 (count %))))
 (s/def :comment/post-id #(= "post.id" (namespace %)))
 (s/def :comment/parent-id (s/or
                             :root nil?
