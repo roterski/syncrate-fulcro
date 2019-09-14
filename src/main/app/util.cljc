@@ -31,3 +31,7 @@
   #?(:cljs ([] (random-uuid)))
   #?(:cljs ([& args]
             (cljs.core/uuid (apply str args)))))
+
+(defn parse-int
+  #?(:clj ([x] (Integer. x)))
+  #?(:cljs ([x] (js/parseInt x))))
