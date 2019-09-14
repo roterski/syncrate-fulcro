@@ -58,7 +58,7 @@
           (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
                          :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post"))
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["post-list" "all-posts"]))} "Posts")
+                       :onClick (fn [] (dr/change-route this ["post-list" "all-posts" "page" 1]))} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid

@@ -2,18 +2,26 @@
   (:require
     [app.posts.mutations :refer [create-post!]]
     [app.database.crux :refer [get-entities]]
+    [app.util :refer [parse-int]]
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
-(defresolver post-list-resolver [{:keys [db]} {:post-list/keys [id]}]
+(defresolver post-list-resolver [{:keys [db] :as env} {:post-list/keys [id]}]
   {::pc/input #{:post-list/id}
-   ::pc/output [:post-list/label {:post-list/posts [:post/id]}]}
-  (let [post-ids (crux/q db
+   ::pc/output [:post-list/label :post-list/page-number {:post-list/posts [:post/id]}]}
+  (let [per-page 10
+        [_ {:keys [page-number]}] (get-in env [:ring/request :transit-params 0])
+        post-ids (crux/q db
                          `{:find [e]
-                           :where [[e :post/title _]]})]
-    {:post-list/id id
-     :post-list/label "All Posts"
-     :post-list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
+                           :where [[e :post/title _]]
+                           :limit ~per-page
+                           :offset ~(* (parse-int page-number) per-page)})]
+    ; TODO: not optimal pagination, naively scrolls through the initial result set each time
+    ; https://juxt.pro/crux/docs/queries.html#_ordering_and_pagination
+      {:post-list/id id
+       :post-list/label "All Posts"
+       :post-list/page-number page-number
+       :post-list/posts (mapv (fn [id] {:post/id (first id)}) post-ids)}))
 
 (defresolver post-resolver [{:keys [db]} {:post/keys [id]}]
   {::pc/input #{:post/id}
