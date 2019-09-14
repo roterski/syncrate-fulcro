@@ -2,9 +2,9 @@
 
 - [ ] url sync with router
 - [x] fix controlled input error
-- [ ] separate files for comments / profiles / posts
-- [ ] split ui components from pages
+- [x] separate files for comments / profiles / posts
 - [ ] token based auth
+- [ ] add specs / ghostwheel / tests
 ### POSTS
 - [x] post show
 - [x] comments
@@ -16,5 +16,7 @@
   - [x] validate post
 - [x] server side validation
 - [ ] votes
-- [ ] pagination / infinite scroll
-- [ ] different views
+- [x] route-based pagination
+- [ ] in-state pagination
+- [ ] infinite scroll
+- [ ] different post list filters
