@@ -11,7 +11,8 @@
     [ring.util.response :refer [response file-response resource-response]]
     [ring.util.response :as resp]
     [hiccup.page :refer [html5]]
-    [taoensso.timbre :as log]))
+    [taoensso.timbre :as log]
+    [clojure.string :as str]))
 
 (def ^:private not-found-handler
   (fn [req]
@@ -84,6 +85,18 @@
       :else
       (ring-handler req))))
 
+(defn all-routes-to-index [handler]
+  (fn [{:keys [uri] :as req}]
+    (if (or
+          (= "/api" uri)
+          (str/ends-with? uri ".css")
+          (str/ends-with? uri ".map")
+          (str/ends-with? uri ".jpg")
+          (str/ends-with? uri ".png")
+          (str/ends-with? uri ".js"))
+      (handler req)
+      (handler (assoc req :uri "/index.html")))))
+
 (defstate middleware
   :start
   (let [defaults-config (:ring.middleware/defaults-config config)
@@ -98,4 +111,5 @@
       ;; code initialized).
       ;; E.g. (wrap-defaults (assoc-in defaults-config [:session :store] (my-store)))
       (wrap-defaults defaults-config)
-      wrap-gzip)))
+      wrap-gzip
+      (all-routes-to-index))))
