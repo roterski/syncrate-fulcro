@@ -1,6 +1,7 @@
 (ns app.auth.mutations
   (:require
     [app.application :refer [SPA]]
+    [app.routing :refer [route-to!]]
     [app.auth.helpers :refer [signup-class signup-ident valid-email? valid-password?]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [taoensso.timbre :as log]
@@ -26,7 +27,7 @@
     (log/info "Marking complete")
     (swap! state fs/mark-complete* signup-ident))
   (ok-action [{:keys [app state]}]
-    (dr/change-route app ["signup-success"]))
+    (route-to! "/signup-success"))
   (remote [{:keys [state] :as env}]
     (let [{:account/keys [email password password-again]} (get-in @state signup-ident)]
       (boolean (and (valid-email? email) (valid-password? password)

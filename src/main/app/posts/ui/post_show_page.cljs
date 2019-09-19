@@ -22,9 +22,9 @@
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}]
    :ident :post/id
-   :route-segment ["post-show" :post/id]
-   :will-enter (fn [app {:post/keys [id]}]
-                 (let [id (keyword id)]
+   :route-segment ["post-show" :id]
+   :will-enter (fn [app {:keys [id]}]
+                 (let [id (keyword "post.id" id)]
                    (dr/route-deferred [:post/id id]
                                       #(df/load app [:post/id id] PostShowPage
                                                 {:post-mutation `dr/target-ready
@@ -38,8 +38,6 @@
       (ui-new-comment-button this new-comment id nil)
       (h2 "Comments")
       (map ui-comment saved-comments))))
-
-
 
 (comment
   (let [state (app/current-state SPA)

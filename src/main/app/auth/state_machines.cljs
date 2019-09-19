@@ -1,6 +1,7 @@
 (ns app.auth.state-machines
   (:require
     [app.application :refer [SPA]]
+    [app.routing :refer [route-to!]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [com.fulcrologic.fulcro.ui-state-machines :as uism]
     [com.fulcrologic.fulcro.mutations :as m]))
@@ -28,8 +29,8 @@
 
 (defn process-session-result [env error-message]
   (let [success? (uism/alias-value env :session-valid?)]
-    (when success?
-      (dr/change-route SPA ["main"]))
+    ;(when success?
+    ;  (route-to! "/main"))
     (cond-> (clear env)
       success? (->
                  (uism/assoc-aliased :modal-open? false)
@@ -56,7 +57,7 @@
    {:initial
     {::uism/target-states #{:state/logged-in :state/logged-out}
      ::uism/events        {::uism/started  {::uism/handler (fn [env]
-                                                             (dr/change-route SPA ["main"])
+                                                             ;(dr/change-route SPA ["main"])
                                                              (-> env
                                                                (uism/assoc-aliased :error "")
                                                                (uism/load ::current-session :actor/current-session

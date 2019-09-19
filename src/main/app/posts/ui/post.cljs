@@ -22,7 +22,7 @@
   (dom/div :.ui.container.segment
     (div
       (dom/h5
-        (dom/a {:onClick (fn [] (dr/change-route this ["post-show" (id-link id)]))} title))
+        (dom/a {:href (str "/post-show/" (name id))} title))
       (p body)
       (ui-profile author))))
 
