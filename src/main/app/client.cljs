@@ -1,12 +1,14 @@
 (ns app.client
   (:require
     [app.application :refer [SPA]]
+    [app.routing :as routing]
     [com.fulcrologic.fulcro.application :as app]
     [app.ui.root :as root]
     [app.auth.ui.login :refer [Login]]
     [app.auth.ui.session :refer [Session]]
     [app.auth.state-machines :as session]
     [com.fulcrologic.fulcro.networking.http-remote :as net]
+    [com.fulcrologic.fulcro.mutations :refer [defmutation]]
     [com.fulcrologic.fulcro.data-fetch :as df]
     [com.fulcrologic.fulcro.ui-state-machines :as uism]
     [com.fulcrologic.fulcro.components :as comp]
@@ -14,6 +16,13 @@
     [com.fulcrologic.fulcro.algorithms.denormalize :as fdn]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
     [taoensso.timbre :as log]))
+
+(defmutation finish-login [_]
+  (action [{:keys [app state]}]
+    (let [logged-in? (get-in @state [:component/id :session :session/valid?])]
+      (when-not logged-in?
+        (routing/route-to! "/main")) ; TODO: change to /login
+      (swap! state (fn [s] (assoc-in s [:component/id :top-chrome :root/ready?] true))))))
 
 (defn ^:export refresh []
   (log/info "Hot code Remount")
@@ -24,13 +33,14 @@
   (log/info "Application starting.")
   (cssi/upsert-css "componentcss" {:component root/Root})
   (app/set-root! SPA root/Root {:initial-state? true})
+  (app/mount! SPA root/Root "app" {:initial-state? true})
   (dr/initialize! SPA)
+  (routing/start!)
   (log/info "Starting session machine.")
-  (df/load! SPA :app.auth.resolvers/current-session Session)
+  (df/load! SPA :app.auth.resolvers/current-session Session {:post-mutation `finish-login})
   (uism/begin! SPA session/session-machine ::session/session
     {:actor/login-form      Login
-     :actor/current-session Session})
-  (app/mount! SPA root/Root "app" {:initial-state? true}))
+     :actor/current-session Session}))
 
 
 (comment

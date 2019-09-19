@@ -18,10 +18,10 @@
     (div "Page")
     (div
       (if (> previous-page 0)
-        (dom/a :.item {:onClick (fn [] (dr/change-route component ["post-list" "all-posts" "page" previous-page]))} " < ")
+        (dom/a :.item {:href (str "/post-list/all-posts/page/" previous-page)} " < ")
         " | ")
       current-page
-      (dom/a :.item {:onClick (fn [] (dr/change-route component ["post-list" "all-posts" "page" next-page]))} " > "))))
+      (dom/a :.item {:href (str "/post-list/all-posts/page/" next-page)} " > "))))
 
 (defsc PostListPage [this {:post-list/keys [id label posts page-number] :as props}]
   {:query [:post-list/id :post-list/label :post-list/page-number {:post-list/posts (comp/get-query Post)}]

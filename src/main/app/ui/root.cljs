@@ -37,33 +37,36 @@
 (def ui-top-router (comp/factory TopRouter))
 
 
-(defsc TopChrome [this {:root/keys [router current-session login]}]
-  {:query         [{:root/router (comp/get-query TopRouter)}
+(defsc TopChrome [this {:root/keys [ready? router current-session login]}]
+  {:query         [:root/ready?
+                   {:root/router (comp/get-query TopRouter)}
                    {:root/current-session (comp/get-query Session)}
                    [::uism/asm-id ::TopRouter]
                    {:root/login (comp/get-query Login)}]
    :ident         (fn [] [:component/id :top-chrome])
-   :initial-state {:root/router          {}
+   :initial-state {:root/ready? false
+                   :root/router          {}
                    :root/login           {}
                    :root/current-session {}}}
   (let [current-tab (some-> (dr/current-route this this) first keyword)]
     (div :.ui.container
       (div :.ui.secondary.pointing.menu
         (dom/a :.item {:classes [(when (= :main current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["main"]))} "Main")
+                       :href "/main"} "Main")
         (when (:session/valid? current-session)
           (dom/a :.item {:classes [(when (= :settings current-tab) "active")]
-                         :onClick (fn [] (dr/change-route this ["settings"]))} "Settings"))
+                         :href "/settings"} "Settings"))
         (when (:session/valid? current-session)
           (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
-                         :onClick (fn [] (dr/change-route this ["new-post"]))} "New Post"))
+                         :href "/new-post"} "New Post"))
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
-                       :onClick (fn [] (dr/change-route this ["post-list" "all-posts" "page" 1]))} "Posts")
+                       :href "/post-list/all-posts/page/1"} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid
         (div :.ui.row
-          (ui-top-router router))))))
+          (when ready?
+           (ui-top-router router)))))))
 
 (def ui-top-chrome (comp/factory TopChrome))
 
