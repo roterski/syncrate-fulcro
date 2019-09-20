@@ -18,9 +18,10 @@
    [taoensso.timbre :as log]
    [com.fulcrologic.fulcro-css.css :as css]))
 
-(defsc PostShowPage [this {:post/keys [id title body author comments] :as post}]
+(defsc PostShowPage [this {:post/keys [id title body author new-comment comments] :as post}]
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
-           {:post/comments (comp/get-query Comment)}]
+           {:post/comments (comp/get-query Comment)}
+           {:post/new-comment (comp/get-query Comment)}]
    :ident :post/id
    :route-segment ["posts" :id]
    :will-enter (fn [app {:keys [id]}]
@@ -29,15 +30,12 @@
                                       #(df/load app [:post/id id] PostShowPage
                                                 {:post-mutation `dr/target-ready
                                                  :post-mutation-params {:target [:post/id id]}}))))}
-  (let [filter-fn #(tempid/tempid? (:comment/id %))
-        new-comment (first (filter filter-fn comments))
-        saved-comments (filter (complement filter-fn) comments)]
-    (div :.ui.container.segment
-      (h1 "Post")
-      (ui-post post)
-      (ui-new-comment-button this new-comment id nil)
-      (h2 "Comments")
-      (map ui-comment saved-comments))))
+  (div :.ui.container.segment
+    (h1 "Post")
+    (ui-post post)
+    (ui-new-comment-button this new-comment id nil)
+    (h2 "Comments")
+    (map ui-comment comments)))
 
 (comment
   (let [state (app/current-state SPA)

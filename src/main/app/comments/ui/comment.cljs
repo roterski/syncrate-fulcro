@@ -9,22 +9,20 @@
 
 (declare ui-comment)
 
-(defsc Comment [this {:comment/keys [id body post-id children]}]
+(defsc Comment [this {:comment/keys [id body post-id children new-comment]}]
   {:query (fn [] [:comment/id :comment/body :comment/post-id
+                  {:comment/new-comment '...}
                   {:comment/children '...}])
    :ident :comment/id}
-  (let [filter-fn #(tempid/tempid? (:comment/id %))
-        new-comment (first (filter filter-fn children))
-        saved-children (filter (complement filter-fn) children)]
-    (div :.ui.container.segment
-      body
-      (when (not (tempid/tempid? id))
-        (ui-new-comment-button this new-comment post-id id))
-      (when (seq saved-children)
-        (div
-          (dom/ul
-            (map
-             (fn [p] (ui-comment p))
-             saved-children)))))))
+  (div :.ui.container.segment
+    body
+    (when (not (tempid/tempid? id))
+      (ui-new-comment-button this new-comment post-id id))
+    (when (seq children)
+      (div
+        (dom/ul
+          (map
+           #(ui-comment %)
+           children))))))
 
 (def ui-comment (comp/factory Comment {:keyfn :comment/id}))
