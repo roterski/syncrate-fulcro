@@ -22,7 +22,7 @@
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}]
    :ident :post/id
-   :route-segment ["post-show" :id]
+   :route-segment ["posts" :id]
    :will-enter (fn [app {:keys [id]}]
                  (let [id (keyword "post.id" id)]
                    (dr/route-deferred [:post/id id]

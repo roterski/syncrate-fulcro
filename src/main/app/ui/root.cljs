@@ -60,7 +60,7 @@
           (dom/a :.item {:classes [(when (= :new-post current-tab) "active")]
                          :href "/new-post"} "New Post"))
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
-                       :href "/post-list/all-posts/page/1"} "Posts")
+                       :href "/posts/all/page/1"} "Posts")
         (div :.right.menu
           (ui-login login)))
       (div :.ui.grid
