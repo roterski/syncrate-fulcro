@@ -2,6 +2,7 @@
   (:require
     [app.comments.validations]
     [app.ui.components :refer [field]]
+    [app.auth.ui.session :refer [Session]]
     [goog.object :as gobj]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
@@ -40,7 +41,7 @@
   [state-map {:comment/keys [id post-id parent-id] :as props}]
   (cond-> state-map
     true (update-in [:comment/id] dissoc id)
-    (some? post-id) (update-in [:post/id post-id] dissoc :post/new-comment)
+    (nil? parent-id) (update-in [:post/id post-id] dissoc :post/new-comment)
     (some? parent-id) (update-in [:comment/id parent-id] dissoc :comment/new-comment)))
 
 (defn remove-comment-form*
@@ -71,6 +72,7 @@
   (action [{:keys [state]}]
     (log/info "Creating comment..."))
   (ok-action [{:keys [state result] :as env}]
+    (log/info "...comment created successfully")
     (let [id (get-in result [:body `create-comment! :tempids tempid])]
       (swap! state (fn [s]
                      (-> s

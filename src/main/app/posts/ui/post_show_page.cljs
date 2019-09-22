@@ -2,6 +2,7 @@
   (:require
    [app.posts.ui.post :refer [Post ui-post]]
    [app.profiles.ui.profile :refer [Profile]]
+   [app.auth.ui.session :refer [Session]]
    [app.comments.ui.new-comment-button :refer [ui-new-comment-button]]
    [app.comments.ui.comment :refer [ui-comment Comment]]
    [app.comments.ui.comment-form :refer [ui-comment-form]]
@@ -18,10 +19,11 @@
    [taoensso.timbre :as log]
    [com.fulcrologic.fulcro-css.css :as css]))
 
-(defsc PostShowPage [this {:post/keys [id title body author new-comment comments] :as post}]
+(defsc PostShowPage [this {:post/keys [id title body author new-comment comments] :keys [current-session] :as props}]
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}
-           {:post/new-comment (comp/get-query Comment)}]
+           {:post/new-comment (comp/get-query Comment)}
+           {:current-session (comp/get-query Session)}]
    :ident :post/id
    :route-segment ["posts" :id]
    :will-enter (fn [app {:keys [id]}]
@@ -32,8 +34,9 @@
                                                  :post-mutation-params {:target [:post/id id]}}))))}
   (div :.ui.container.segment
     (h1 "Post")
-    (ui-post post)
-    (ui-new-comment-button this new-comment id nil)
+    (ui-post props)
+    (when (:session/valid? current-session)
+      (ui-new-comment-button this {:new-comment new-comment :post-id id :parent-id nil}))
     (h2 "Comments")
     (map ui-comment comments)))
 

@@ -37,7 +37,7 @@
   (dr/initialize! SPA)
   (routing/start!)
   (log/info "Starting session machine.")
-  (df/load! SPA :app.auth.resolvers/current-session Session {:post-mutation `finish-login})
+  (df/load! SPA :current-session Session {:post-mutation `finish-login})
   (uism/begin! SPA session/session-machine ::session/session
     {:actor/login-form      Login
      :actor/current-session Session}))
