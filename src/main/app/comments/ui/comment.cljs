@@ -14,7 +14,7 @@
   {:query (fn [] [:comment/id :comment/body :comment/post-id
                   {:comment/new-comment '...}
                   {:comment/children '...}
-                  {:current-session (comp/get-query Session)}])
+                  {[:current-session '_] (comp/get-query Session)}])
    :ident :comment/id}
   (div :.ui.container.segment
     body

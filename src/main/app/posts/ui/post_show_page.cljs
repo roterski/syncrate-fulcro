@@ -23,7 +23,7 @@
   {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}
            {:post/new-comment (comp/get-query Comment)}
-           {:current-session (comp/get-query Session)}]
+           {[:current-session '_] (comp/get-query Session)}]
    :ident :post/id
    :route-segment ["posts" :id]
    :will-enter (fn [app {:keys [id]}]
