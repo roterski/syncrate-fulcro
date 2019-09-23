@@ -1,6 +1,7 @@
 (ns app.ui.root
   (:require
-    [app.auth.ui.login :refer [Login ui-login]]
+    [app.auth.ui.login-button :refer [ui-login-button]]
+    [app.auth.ui.login-page :refer [LoginPage]]
     [app.auth.ui.session :refer [Session]]
     [app.auth.ui.signup :refer [Signup]]
     [app.auth.ui.signup-success :refer [SignupSuccess]]
@@ -32,21 +33,19 @@
     (h3 "Settings")))
 
 (dr/defrouter TopRouter [this props]
-  {:router-targets [Main Settings Signup SignupSuccess NewPostPage PostListPage PostShowPage]})
+  {:router-targets [Main Settings LoginPage Signup SignupSuccess NewPostPage PostListPage PostShowPage]})
 
 (def ui-top-router (comp/factory TopRouter))
 
 
-(defsc TopChrome [this {:root/keys [ready? router current-session login]}]
+(defsc TopChrome [this {:root/keys [ready? router current-session]}]
   {:query         [:root/ready?
                    {:root/router (comp/get-query TopRouter)}
                    {:root/current-session (comp/get-query Session)}
-                   [::uism/asm-id ::TopRouter]
-                   {:root/login (comp/get-query Login)}]
+                   [::uism/asm-id ::TopRouter]]
    :ident         (fn [] [:component/id :top-chrome])
    :initial-state {:root/ready? false
                    :root/router          {}
-                   :root/login           {}
                    :root/current-session {}}}
   (let [current-tab (some-> (dr/current-route this this) first keyword)]
     (div :.ui.container
@@ -62,7 +61,7 @@
         (dom/a :.item {:classes [(when (= :post-list current-tab) "active")]
                        :href "/posts/all/page/1"} "Posts")
         (div :.right.menu
-          (ui-login login)))
+          (ui-login-button this current-session)))
       (div :.ui.grid
         (div :.ui.row
           (when ready?

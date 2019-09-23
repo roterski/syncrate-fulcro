@@ -34,7 +34,7 @@
                      (log/info "Sign up")))
         checked? (log/spy :info (fs/checked? props))]
     (div
-      (dom/h3 "Signup")
+      (dom/h3 :.ui.header "Signup")
       (div :.ui.form {:classes [(when checked? "error")]}
         (field {:label         "Email"
                 :value         (or email "")

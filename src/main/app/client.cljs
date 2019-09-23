@@ -4,7 +4,7 @@
     [app.routing :as routing]
     [com.fulcrologic.fulcro.application :as app]
     [app.ui.root :as root]
-    [app.auth.ui.login :refer [Login]]
+    [app.auth.ui.login-page :refer [LoginPage]]
     [app.auth.ui.session :refer [Session]]
     [app.auth.state-machines :as session]
     [com.fulcrologic.fulcro.networking.http-remote :as net]
@@ -19,10 +19,7 @@
 
 (defmutation finish-login [_]
   (action [{:keys [app state]}]
-    (let [logged-in? (get-in @state [:component/id :session :session/valid?])]
-      (when-not logged-in?
-        (routing/route-to! "/main")) ; TODO: change to /login
-      (swap! state (fn [s] (assoc-in s [:component/id :top-chrome :root/ready?] true))))))
+    (swap! state (fn [s] (assoc-in s [:component/id :top-chrome :root/ready?] true)))))
 
 (defn ^:export refresh []
   (log/info "Hot code Remount")
@@ -39,7 +36,7 @@
   (log/info "Starting session machine.")
   (df/load! SPA :current-session Session {:post-mutation `finish-login})
   (uism/begin! SPA session/session-machine ::session/session
-    {:actor/login-form      Login
+    {:actor/login-form      LoginPage
      :actor/current-session Session}))
 
 
