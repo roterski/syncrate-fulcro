@@ -20,7 +20,7 @@
     (crux/submit-tx
       crux-node
       [[:crux.tx/put
-        {:crux.db/id (keyword "account.id" (str (util/uuid)))
+        {:crux.db/id (util/uuid)
          :account/email email
          :account/password-hash password-hash}]])))
 

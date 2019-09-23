@@ -14,8 +14,8 @@
   (clojure.string/join " "[(tt/quality) (tt/color) (tt/animal)]))
 
 (defn create-post [crux-node account-id {:post/keys [title body] :as post}]
-  (let [post-id (keyword "post.id" (str (util/uuid)))
-        profile-uuid (keyword "profile.id" (str (util/uuid)))]
+  (let [post-id (util/uuid)
+        profile-uuid (util/uuid)]
     (if (valid-post? post)
       (do
         (crux/submit-tx
