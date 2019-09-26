@@ -27,4 +27,4 @@
            ui-comment
            children))))))
 
-(def ui-comment (comp/factory Comment {:keyfn :comment/id}))
+(def ui-comment (comp/factory Comment {:keyfn #(-> % :comment/id str)}))

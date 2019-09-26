@@ -26,4 +26,4 @@
       (p body)
       (ui-profile author))))
 
-(def ui-post (comp/factory Post {:keyfn :post/id}))
+(def ui-post (comp/factory Post {:keyfn #(-> % :post/id str)}))

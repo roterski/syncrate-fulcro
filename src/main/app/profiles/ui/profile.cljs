@@ -8,4 +8,4 @@
    :ident :profile/id}
   (div "by " name))
 
-(def ui-profile (comp/factory Profile {:keyfn :profile/id}))
+(def ui-profile (comp/factory Profile {:keyfn #(-> % :profile/id str)}))

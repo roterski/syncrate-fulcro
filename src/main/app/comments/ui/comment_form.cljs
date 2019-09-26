@@ -115,4 +115,4 @@
           "Create")
         (dom/button :.ui.secondary.button {:onClick cancel} "Cancel")))))
 
-(def ui-comment-form (comp/computed-factory CommentForm {:keyfn :comment/id}))
+(def ui-comment-form (comp/computed-factory CommentForm {:keyfn #(-> % :comment/id str)}))
