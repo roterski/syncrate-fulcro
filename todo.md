@@ -1,14 +1,15 @@
 ## TODO
 
+### MISC
 - [x] url sync with router
 - [x] fix controlled input error
 - [x] separate files for comments / profiles / posts
+- [x] simplify route names
+- [x] server side validation
+- [ ] prepare for deployment
 - [ ] token based auth
 - [ ] add specs / ghostwheel / tests
 - [ ] add styling and logo
-- [ ] simplify route names
-- [ ] prepare for deployment
-- [x] server side validation
 ### POSTS
 - [x] post show
 - [ ] votes
