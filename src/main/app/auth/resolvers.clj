@@ -6,12 +6,12 @@
     [taoensso.timbre :as log]))
 
 (defresolver current-session-resolver [env input]
-  {::pc/output [{::current-session [:session/valid? :account/name]}]}
+  {::pc/output [{:current-session [:session/valid? :account/name]}]}
   (let [{:keys [account/name session/valid?]} (get-in env [:ring/request :session])]
     (if valid?
       (do
         (log/info name "already logged in!")
-        {::current-session {:session/valid? true :account/name name}})
-      {::current-session {:session/valid? false}})))
+        {:current-session {:session/valid? true :account/name name}})
+      {:current-session {:session/valid? false}})))
 
 (def resolvers [current-session-resolver login logout signup!])

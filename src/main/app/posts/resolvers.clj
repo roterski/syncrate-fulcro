@@ -12,10 +12,10 @@
   (let [per-page 10
         [_ {:keys [page-number]}] (get-in env [:ring/request :transit-params 0])
         post-ids (crux/q db
-                         `{:find [e]
-                           :where [[e :post/title _]]
-                           :limit ~per-page
-                           :offset ~(* (parse-int page-number) per-page)})]
+                         `{:find   [e]
+                           :where  [[e :post/title _]]
+                           :limit  ~per-page
+                           :offset ~(* (dec (parse-int page-number)) per-page)})]
     ; TODO: not optimal pagination, naively scrolls through the initial result set each time
     ; https://juxt.pro/crux/docs/queries.html#_ordering_and_pagination
       {:post-list/id id

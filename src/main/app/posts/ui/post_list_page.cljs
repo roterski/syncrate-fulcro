@@ -18,15 +18,15 @@
     (div "Page")
     (div
       (if (> previous-page 0)
-        (dom/a :.item {:href (str "/post-list/all-posts/page/" previous-page)} " < ")
+        (dom/a :.item {:href (str "/posts/all/page/" previous-page)} " < ")
         " | ")
       current-page
-      (dom/a :.item {:href (str "/post-list/all-posts/page/" next-page)} " > "))))
+      (dom/a :.item {:href (str "/posts/all/page/" next-page)} " > "))))
 
 (defsc PostListPage [this {:post-list/keys [id label posts page-number] :as props}]
   {:query [:post-list/id :post-list/label :post-list/page-number {:post-list/posts (comp/get-query Post)}]
    :ident :post-list/id
-   :route-segment ["post-list" :post-list/id "page" :post-list/page-number]
+   :route-segment ["posts" :post-list/id "page" :post-list/page-number]
    :will-enter (fn [app {:post-list/keys [id page-number]}]
                  (let [id (keyword id)]
                    (dr/route-deferred [:post-list/id id]

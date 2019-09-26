@@ -2,6 +2,7 @@
   (:require
     [app.comments.validations]
     [app.ui.components :refer [field]]
+    [app.auth.ui.session :refer [Session]]
     [goog.object :as gobj]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.dom.events :as evt]
@@ -19,10 +20,10 @@
   [state-map {:comment/keys [id post-id parent-id] :as props}]
   (let [comment-ident [:comment/id id]
         parent-ident (if (nil? parent-id)
-                       [:post/id post-id :post/comments]
-                       [:comment/id parent-id :comment/children])]
+                       [:post/id post-id :post/new-comment]
+                       [:comment/id parent-id :comment/new-comment])]
     (-> state-map
-        (update-in parent-ident (fnil conj []) comment-ident)
+        (assoc-in parent-ident comment-ident)
         (assoc-in comment-ident props))))
 
 (declare CommentForm)
@@ -37,16 +38,15 @@
                          (fs/add-form-config* CommentForm [:comment/id comment-id])))))))
 
 (defn remove-comment*
-  [state-map {:comment/keys [id post-id parent-id]}]
-  (let [remove-fn (fn [c] (vec (remove #(= id (second %)) c)))]
-    (cond-> state-map
-      true (update-in [:comment/id] dissoc id)
-      (some? post-id) (update-in [:post/id post-id :post/comments] remove-fn)
-      (some? parent-id) (update-in [:comment/id parent-id :comment/children] remove-fn))))
+  [state-map {:comment/keys [id post-id parent-id] :as props}]
+  (cond-> state-map
+    true (update-in [:comment/id] dissoc id)
+    (nil? parent-id) (update-in [:post/id post-id] dissoc :post/new-comment)
+    (some? parent-id) (update-in [:comment/id parent-id] dissoc :comment/new-comment)))
 
 (defn remove-comment-form*
   [state-map {:comment/keys [id]}]
-  (let [form-id {:table :comment/id, :row id}]
+  (let [form-id {:table :comment/id :row id}]
     (-> state-map
       (update-in [::fs/forms-by-ident] dissoc form-id))))
 
@@ -58,14 +58,26 @@
                        (remove-comment* props)
                        (remove-comment-form* props))))))
 
-(defmutation create-comment! [{:comment/keys [tempid]}]
+(defn move-comment-from-new*
+  [state-map {:comment/keys [id post-id parent-id] :as props}]
+  (let [comment-ident [:comment/id id]
+        post-comment? (nil? parent-id)]
+    (cond-> state-map
+            post-comment? (update-in [:post/id post-id] dissoc :post/new-comment)
+            post-comment? (update-in [:post/id post-id :post/comments] (fnil conj []) comment-ident)
+            (not post-comment?) (update-in [:comment/id parent-id] dissoc :comment/new-comment)
+            (not post-comment?) (update-in [:comment/id parent-id :comment/children] (fnil conj []) comment-ident))))
+
+(defmutation create-comment! [{:comment/keys [tempid] :as props}]
   (action [{:keys [state]}]
     (log/info "Creating comment..."))
   (ok-action [{:keys [state result] :as env}]
-    (log/info "...comment created successfully!")
-    (swap! state (fn [s]
-                   (-> s
-                       (remove-comment-form* {:id tempid})))))
+    (log/info "...comment created successfully")
+    (let [id (get-in result [:body `create-comment! :tempids tempid])]
+      (swap! state (fn [s]
+                     (-> s
+                         (move-comment-from-new* (merge props {:comment/id id}))
+                         (remove-comment-form* {:comment/id id}))))))
   (error-action [env]
     (log/error "...creating comment failed")
     (log/error env))

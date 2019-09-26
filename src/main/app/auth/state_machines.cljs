@@ -27,18 +27,6 @@
        ::uism/error-event :event/failed})
     (uism/activate :state/checking-session)))
 
-(defn process-session-result [env error-message]
-  (let [success? (uism/alias-value env :session-valid?)]
-    ;(when success?
-    ;  (route-to! "/main"))
-    (cond-> (clear env)
-      success? (->
-                 (uism/assoc-aliased :modal-open? false)
-                 (uism/activate :state/logged-in))
-      (not success?) (->
-                       (uism/assoc-aliased :error error-message)
-                       (uism/activate :state/logged-out)))))
-
 (def global-events
   {:event/toggle-modal {::uism/handler (fn [env] (uism/update-aliased env :modal-open? not))}})
 
@@ -57,7 +45,6 @@
    {:initial
     {::uism/target-states #{:state/logged-in :state/logged-out}
      ::uism/events        {::uism/started  {::uism/handler (fn [env]
-                                                             ;(dr/change-route SPA ["main"])
                                                              (-> env
                                                                (uism/assoc-aliased :error "")
                                                                (uism/load ::current-session :actor/current-session
@@ -65,7 +52,13 @@
                                                                   ::uism/error-event :event/failed})))}
                            :event/failed   {::uism/target-state :state/logged-out}
                            :event/complete {::uism/target-states #{:state/logged-in :state/logged-out}
-                                            ::uism/handler       #(process-session-result % "")}}}
+                                            ::uism/handler       (fn [env]
+                                                                   (let [success? (uism/alias-value env :session-valid?)]
+                                                                     (cond-> (clear env)
+                                                                       success? (->
+                                                                                  (uism/activate :state/logged-in))
+                                                                       (not success?) (->
+                                                                                        (uism/activate :state/logged-out)))))}}}
 
     :state/checking-session
     {::uism/events (merge global-events
@@ -73,9 +66,22 @@
                                        ::uism/handler       (fn [env]
                                                               (-> env
                                                                 (clear)
-                                                                (uism/assoc-aliased :error "Server error.")))}
+                                                                (uism/assoc-aliased :error "Server error.")
+                                                                (uism/activate :state/logged-out)))}
                       :event/complete {::uism/target-states #{:state/logged-out :state/logged-in}
-                                       ::uism/handler       #(process-session-result % "Invalid Credentials.")}})}
+                                       ::uism/handler       (fn [env]
+                                                              (let [success? (uism/alias-value env :session-valid?)]
+                                                                (when success?
+                                                                  (route-to! "/main"))
+                                                                (cond-> (clear env)
+                                                                  success? (->
+                                                                             (uism/activate :state/logged-in))
+                                                                  (not success?) (->
+                                                                                   (uism/assoc-aliased :error "Invalid credentials")
+                                                                                   (uism/activate :state/logged-out)))))}})}
+
+
+
 
     :state/logged-in
     {::uism/events (merge global-events

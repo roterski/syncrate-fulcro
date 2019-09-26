@@ -1,6 +1,7 @@
 (ns app.posts.ui.post-form
   (:require
     [app.posts.validations]
+    [app.routing :refer [route-to!]]
     [app.ui.components :refer [field]]
     [clojure.set :refer [intersection subset?]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
@@ -59,7 +60,7 @@
                    (-> s
                        (update-in [::fs/forms-by-ident] dissoc {:table :post/id :row tempid})
                        (assoc-in [:component/id :new-post-page :new-post-page/post] nil))))
-    (dr/change-route app ["post-list" "all-posts" "page" 1]))
+    (route-to! "/posts/all/page/1"))
   (error-action [env]
     (log/error "...creating post failed!")
     (log/error env))

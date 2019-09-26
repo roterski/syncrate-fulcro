@@ -1,6 +1,7 @@
 (ns app.comments.ui.comment
   (:require
     [app.comments.ui.comment-form :refer [ui-comment-form]]
+    [app.auth.ui.session :refer [Session]]
     [app.comments.ui.new-comment-button :refer [ui-new-comment-button]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2]]
     [com.fulcrologic.fulcro.algorithms.tempid :as tempid]
@@ -9,22 +10,21 @@
 
 (declare ui-comment)
 
-(defsc Comment [this {:comment/keys [id body post-id children]}]
+(defsc Comment [this {:comment/keys [id body post-id children new-comment] :keys [current-session] :as props}]
   {:query (fn [] [:comment/id :comment/body :comment/post-id
-                  {:comment/children '...}])
+                  {:comment/new-comment '...}
+                  {:comment/children '...}
+                  {[:current-session '_] (comp/get-query Session)}])
    :ident :comment/id}
-  (let [filter-fn #(tempid/tempid? (:comment/id %))
-        new-comment (first (filter filter-fn children))
-        saved-children (filter (complement filter-fn) children)]
-    (div :.ui.container.segment
-      body
-      (when (not (tempid/tempid? id))
-        (ui-new-comment-button this new-comment post-id id))
-      (when (seq saved-children)
-        (div
-          (dom/ul
-            (map
-             (fn [p] (ui-comment p))
-             saved-children)))))))
+  (div :.ui.container.segment
+    body
+    (when (:session/valid? current-session)
+      (ui-new-comment-button this {:new-comment new-comment :post-id post-id :parent-id id}))
+    (when (seq children)
+      (div
+        (dom/ul
+          (map
+           ui-comment
+           children))))))
 
 (def ui-comment (comp/factory Comment {:keyfn :comment/id}))
