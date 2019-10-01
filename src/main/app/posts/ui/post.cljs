@@ -4,14 +4,11 @@
     [app.profiles.ui.profile :refer [Profile ui-profile]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div ul li p h1 h3 button]]
     [com.fulcrologic.fulcro.routing.dynamic-routing :as dr]
-    [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
-    [com.fulcrologic.fulcro.components :as comp]
+    [com.fulcrologic.fulcro.components :as comp :refer [defsc]]
     [com.fulcrologic.fulcro.mutations :as m :refer [defmutation]]
     [taoensso.timbre :as log]
     [com.fulcrologic.fulcro-css.css :as css]
     [com.fulcrologic.fulcro.algorithms.form-state :as fs]))
-
-(defn id-link [id] (str (namespace id) "/" (name id)))
 
 (defsc Post [this {:post/keys [id title body author]}]
   {:query [:post/id

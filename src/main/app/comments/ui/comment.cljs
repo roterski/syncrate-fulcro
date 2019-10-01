@@ -5,8 +5,7 @@
     [app.comments.ui.new-comment-button :refer [ui-new-comment-button]]
     [com.fulcrologic.fulcro.dom :as dom :refer [div h1 h2]]
     [com.fulcrologic.fulcro.algorithms.tempid :as tempid]
-    [com.fulcrologic.fulcro.components :as prim :refer [defsc]]
-    [com.fulcrologic.fulcro.components :as comp]))
+    [com.fulcrologic.fulcro.components :as comp :refer [defsc]]))
 
 (declare ui-comment)
 
