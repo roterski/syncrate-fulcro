@@ -26,13 +26,12 @@
            {[:current-session '_] (comp/get-query Session)}]
    :ident :post/id
    :route-segment ["posts" :id]
-   :will-enter (fn [app {:keys [id]}]
-                 (let [id (keyword "post.id" id)]
-                   (dr/route-deferred [:post/id id]
-                                      #(df/load app [:post/id id] PostShowPage
-                                                {:without #{[:current-session '_]}
-                                                 :post-mutation `dr/target-ready
-                                                 :post-mutation-params {:target [:post/id id]}}))))}
+   :will-enter    (fn [app {:keys [id]}]
+                    (dr/route-deferred [:post/id id]
+                                       #(df/load app [:post/id id] PostShowPage
+                                                 {:without              #{[:current-session '_]}
+                                                  :post-mutation        `dr/target-ready
+                                                  :post-mutation-params {:target [:post/id id]}})))}
   (div :.ui.container.segment
     (h1 "Post")
     (ui-post props)

@@ -11,7 +11,7 @@
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
 (defn create-comment [crux-node account-id {:comment/keys [body post-id parent-id] :as comment}]
-  (let [comment-id (keyword "comment.id" (str (util/uuid)))]
+  (let [comment-id (util/uuid)]
     (if (valid-comment? comment)
       (do
         (crux/submit-tx

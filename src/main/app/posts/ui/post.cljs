@@ -19,7 +19,7 @@
   (dom/div :.ui.container.segment
     (div
       (dom/h5
-        (dom/a {:href (str "/posts/" (name id))} title))
+        (dom/a {:href (str "/posts/" id)} title))
       (p body)
       (ui-profile author))))
 
