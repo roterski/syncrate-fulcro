@@ -7,4 +7,5 @@
  ;; You probably want these set to true in real production:
  :ring.middleware/defaults-config
                                  {:proxy    false
-                                  :security {:ssl-redirect false}}}
+                                  :security {:ssl-redirect false}}
+ :db/postgres {:url (System/getenv "DATABASE_URL")}}
