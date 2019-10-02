@@ -1,1 +1,4 @@
-{:taoensso.timbre/logging-config {:level :debug}}
+{:taoensso.timbre/logging-config {:level :debug}
+ :db/postgres {:dbname "syncrate-fulcro-dev"
+               :user "postgres"
+               :password "postgres"}}
