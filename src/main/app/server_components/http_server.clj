@@ -7,10 +7,15 @@
     [org.httpkit.server :as http-kit]
     [taoensso.timbre :as log]))
 
+
 (def env-config
-  (->> {:port (Integer. (System/getenv "PORT"))}
-       (filter (fn [[_k v]] (some? v)))
-       (into {})))
+  (some->>
+    "PORT"
+    System/getenv
+    Integer.
+    (conj [:port])
+    list
+    (into {})))
 
 (defstate http-server
   :start
