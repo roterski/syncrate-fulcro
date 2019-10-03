@@ -8,7 +8,7 @@
     [taoensso.timbre :as log]))
 
 (def env-config
-  (->> {:port (System/getenv "PORT")}
+  (->> {:port (Integer. (System/getenv "PORT"))}
        (filter (fn [[_k v]] (some? v)))
        (into {})))
 
