@@ -7,7 +7,6 @@
     [org.httpkit.server :as http-kit]
     [taoensso.timbre :as log]))
 
-
 (def env-config
   (some->>
     "PORT"
