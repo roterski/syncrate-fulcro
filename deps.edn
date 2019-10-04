@@ -40,4 +40,5 @@
                                      fulcrologic/fulcro-spec     {:mvn/version "3.1.4"}
                                      binaryage/devtools          {:mvn/version "0.9.10"}
                                      ;nubank/workspaces           {:mvn/version "1.0.3"},
-                                     org.clojure/tools.namespace {:mvn/version "0.3.1"}}}}}
+                                     org.clojure/tools.namespace {:mvn/version "0.3.1"}}}
+           :depstar    {:extra-deps {seancorfield/depstar        {:mvn/version "0.3.3"}}}}}

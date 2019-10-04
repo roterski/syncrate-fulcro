@@ -1,12 +1,14 @@
 (ns app.database.crux
   (:require [crux.api :as crux]
             [mount.core :refer [defstate]]
-            [app.server-components.config :refer [config]])
+            [app.server-components.config :refer [config]]
+            [taoensso.timbre :as log])
   (:import (crux.api ICruxAPI)))
 
 (defn jdbc-config-from-url [url]
   (let [regex #"postgres://(?<user>.*):(?<password>.*)@(?<host>.*):(?<port>\d+)\/(?<database>.*)"
         matcher (re-matcher regex url)]
+    (log/info "Configuring jdbc connection with DATABASE_URL env var")
     (if (.matches matcher)
       {:dbtype   "postgresql"
        :dbname   (.group matcher "database")
@@ -14,12 +16,13 @@
        :password (.group matcher "password")
        :host     (.group matcher "host")
        :port     (.group matcher "port")}
-      (throw (ex-info (str "Can't match jdbc config from url") {:url url})))))
+      (throw (ex-info (str "Can't match jdbc config with DATABASE_URL env var") {:url url})))))
 
 (defn jdbc-config [cfg]
-  (let [{:keys [url dbname user password]} (:db/postgres cfg)]
-    (if url
-      (jdbc-config-from-url url)
+  (if-let [url (System/getenv "DATABASE_URL")]
+    (jdbc-config-from-url url)
+    (let [{:keys [dbname user password]} (:db/postgres cfg)]
+      (log/info "Configuring jdbc connection with config file")
       {:dbtype "postgresql"
        :dbname dbname
        :user user
