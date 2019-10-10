@@ -277,14 +277,3 @@ make sure your workspaces js file isn't deployed to production.
 == Standalone Runnable Jar (Production, with advanced optimized client js)
 
 TODO: Use tools deps setup to build runnable jar...
-
-
-== Heroku deployment
-
-
-=== buildpacks
-```
-heroku buildpacks:clear
-heroku buildpacks:add heroku/nodejs
-heroku buildpacks:add heroku/clojure
-```

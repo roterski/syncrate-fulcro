@@ -1,4 +1,6 @@
 ## TODO
+### Security
+- [ ] make config vars production ready (ssl)
 
 ### MISC
 - [x] url sync with router
@@ -6,7 +8,7 @@
 - [x] separate files for comments / profiles / posts
 - [x] simplify route names
 - [x] server side validation
-- [ ] prepare for deployment
+- [x] prepare for deployment
 - [ ] token based auth
 - [ ] add specs / ghostwheel / tests
 - [ ] add styling and logo
