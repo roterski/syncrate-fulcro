@@ -9,8 +9,8 @@
 
 (declare ui-comment)
 
-(defsc Comment [this {:comment/keys [id body post-id children new-comment] :keys [current-session] :as props}]
-  {:query (fn [] [:comment/id :comment/body :comment/post-id
+(defsc Comment [this {:comment/keys [id body post children new-comment] :keys [current-session] :as props}]
+  {:query (fn [] [:comment/id :comment/body :comment/post
                   {:comment/new-comment '...}
                   {:comment/children '...}
                   {[:current-session '_] (comp/get-query Session)}])
@@ -18,7 +18,7 @@
   (div :.ui.container.segment
     body
     (when (:session/valid? current-session)
-      (ui-new-comment-button this {:new-comment new-comment :post-id post-id :parent-id id}))
+      (ui-new-comment-button this {:new-comment new-comment :post post :parent id}))
     (when (seq children)
       (div
         (dom/ul

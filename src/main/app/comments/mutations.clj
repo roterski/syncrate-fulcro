@@ -10,7 +10,7 @@
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
-(defn create-comment [crux-node account-id {:comment/keys [body post-id parent-id] :as comment}]
+(defn create-comment [crux-node account {:comment/keys [body post parent] :as comment}]
   (let [comment-id (util/uuid)]
     (if (valid-comment? comment)
       (do
@@ -19,15 +19,15 @@
           [[:crux.tx/put
             {:crux.db/id comment-id
              :comment/body body
-             :comment/post-id post-id
-             :comment/parent-id parent-id
-             :comment/account-id account-id}]])
+             :comment/post post
+             :comment/parent parent
+             :comment/account account}]])
         comment-id)
       (throw (ex-info "Comment validation failed" comment)))))
 
-(defmutation create-comment! [{:keys [crux-node] :as env} {:comment/keys [tempid body post-id parent-id] :as comment}]
+(defmutation create-comment! [{:keys [crux-node] :as env} {:comment/keys [tempid] :as comment}]
   {::pc/sym 'app.comments.ui.comment-form/create-comment!
-   ::pc/input #{:comment/body :comment/post-id :comment/parent-id}
+   ::pc/input #{:comment/body :comment/post :comment/parent}
    ::pc/output [:comment/id]}
   (let [account-id (get-in env [:ring/request :session :account/id])]
     (if account-id

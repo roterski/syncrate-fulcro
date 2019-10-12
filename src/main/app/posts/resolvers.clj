@@ -36,8 +36,8 @@
   {::pc/input #{:post/id}
    ::pc/output [:post/comments]}
   (let [comment-query {:find '[?e]
-                       :where '[[?e :comment/parent-id parent-id]
-                                [?e :comment/post-id post-id]]
+                       :where '[[?e :comment/parent parent-id]
+                                [?e :comment/post post-id]]
                        :args [{'parent-id nil
                                'post-id id}]}
         comment-ids (mapv (fn [id] {:comment/id (first id)}) (crux/q db comment-query))]

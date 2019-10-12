@@ -36,7 +36,7 @@
     (h1 "Post")
     (ui-post props)
     (when (:session/valid? current-session)
-      (ui-new-comment-button this {:new-comment new-comment :post-id id :parent-id nil}))
+      (ui-new-comment-button this {:new-comment new-comment :post id :parent nil}))
     (h2 "Comments")
     (map ui-comment comments)))
 

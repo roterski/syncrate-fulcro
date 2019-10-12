@@ -7,9 +7,9 @@
 
 (defresolver comment-resolver [{:keys [db]} {:comment/keys [id]}]
              {::pc/input #{:comment/id}
-              ::pc/output [:comment/body :comment/post-id :comment/parent-id :comment/children]}
+              ::pc/output [:comment/body :comment/post :comment/parent :comment/children]}
              (let [children-query `{:find [?e]
-                                    :where [[?e :comment/parent-id ~id]]}
+                                    :where [[?e :comment/parent ~id]]}
                    children (mapv (fn [id] {:comment/id (first id)}) (crux/q db children-query))]
                (merge (crux/entity db id) {:comment/children children})))
 
