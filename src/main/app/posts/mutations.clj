@@ -24,11 +24,11 @@
             {:crux.db/id post-id
              :post/title title
              :post/body body
-             :post/author {:profile/id profile-uuid}}]
+             :post/profile profile-uuid}]
            [:crux.tx/put
             {:crux.db/id profile-uuid
              :profile/name (random-name)
-             :profile/account {:account/id account-id}}]])
+             :profile/account account-id}]])
         post-id)
       (throw (ex-info "Post validation failed" post)))))
 

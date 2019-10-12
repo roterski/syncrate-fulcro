@@ -19,8 +19,8 @@
    [taoensso.timbre :as log]
    [com.fulcrologic.fulcro-css.css :as css]))
 
-(defsc PostShowPage [this {:post/keys [id title body author new-comment comments] :keys [current-session] :as props}]
-  {:query [:post/id :post/title :post/body {:post/author (comp/get-query Profile)}
+(defsc PostShowPage [this {:post/keys [id title body profile new-comment comments] :keys [current-session] :as props}]
+  {:query [:post/id :post/title :post/body {:post/profile (comp/get-query Profile)}
            {:post/comments (comp/get-query Comment)}
            {:post/new-comment (comp/get-query Comment)}
            {[:current-session '_] (comp/get-query Session)}]
