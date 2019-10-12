@@ -1,7 +1,7 @@
 (ns app.posts.resolvers
   (:require
     [app.posts.mutations :refer [create-post!]]
-    [app.database.crux :refer [get-entities]]
+    [app.database.crux :refer [get-entities node]]
     [app.util :refer [parse-int]]
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
@@ -25,17 +25,26 @@
 
 (defresolver post-resolver [{:keys [db]} {:post/keys [id]}]
   {::pc/input #{:post/id}
-   ::pc/output [:post/title :post/body :post/author :post/comments]}
+   ::pc/output [:post/title :post/body :post/profile]}
+  (let [post (crux/entity db id)
+        profile-ident (if-let [profile-id (:post/profile post)]
+                        {:profile/id profile-id}
+                        nil)]
+    (assoc post :post/profile profile-ident)))
+
+(defresolver post-comments-resolver [{:keys [db]} {:post/keys [id]}]
+  {::pc/input #{:post/id}
+   ::pc/output [:post/comments]}
   (let [comment-query {:find '[?e]
                        :where '[[?e :comment/parent-id parent-id]
                                 [?e :comment/post-id post-id]]
                        :args [{'parent-id nil
                                'post-id id}]}
         comment-ids (mapv (fn [id] {:comment/id (first id)}) (crux/q db comment-query))]
-    (merge (crux/entity db id)
-      {:post/comments comment-ids})))
+       {:post/comments comment-ids}))
 
-(def resolvers [post-list-resolver post-resolver create-post!])
+
+(def resolvers [post-list-resolver post-resolver post-comments-resolver create-post!])
 
 (comment
   (defn all-profiles []
