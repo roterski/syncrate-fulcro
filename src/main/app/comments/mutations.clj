@@ -3,6 +3,7 @@
     [app.database.crux :refer [get-entities]]
     [app.comments.validations :refer [valid-comment?]]
     [app.auth.resolvers :as auth]
+    [app.posts.mutations :refer [random-name]]
     [app.util :as util]
     [crux.api :as crux]
     [talltale.core :as tt]
@@ -10,8 +11,11 @@
     [com.wsscode.pathom.core :as p]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
+(defn get-post-profile [])
+
 (defn create-comment [crux-node account {:comment/keys [body post parent] :as comment}]
-  (let [comment-id (util/uuid)]
+  (let [comment-id (util/uuid)
+        profile-id (util/uuid)]
     (if (valid-comment? comment)
       (do
         (crux/submit-tx
@@ -21,7 +25,12 @@
              :comment/body body
              :comment/post post
              :comment/parent parent
-             :comment/account account}]])
+             :comment/profile profile-id
+             :comment/account account}]
+           [:crux.tx/put
+            {:crux.db/id profile-id
+             :profile/name (random-name)
+             :profile/account account}]])
         comment-id)
       (throw (ex-info "Comment validation failed" comment)))))
 
