@@ -6,11 +6,20 @@
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
 (defresolver comment-resolver [{:keys [db]} {:comment/keys [id]}]
-             {::pc/input #{:comment/id}
-              ::pc/output [:comment/body :comment/post-id :comment/parent-id :comment/children]}
-             (let [children-query `{:find [?e]
-                                    :where [[?e :comment/parent-id ~id]]}
-                   children (mapv (fn [id] {:comment/id (first id)}) (crux/q db children-query))]
-               (merge (crux/entity db id) {:comment/children children})))
+  {::pc/input #{:comment/id}
+   ::pc/output [:comment/body :comment/post :comment/parent :comment/profile]}
+  (let [comment (crux/entity db id)
+        profile-ident (if-let [profile-id (:comment/profile comment)]
+                        {:profile/id profile-id}
+                        nil)]
+    (assoc comment :comment/profile profile-ident)))
 
-(def resolvers [comment-resolver create-comment!])
+(defresolver comment-children-resolver [{:keys [db]} {:comment/keys [id]}]
+  {::pc/input #{:comment/id}
+   ::pc/output [:comment/children]}
+  (let [children-query `{:find [?e]
+                         :where [[?e :comment/parent ~id]]}
+        children (mapv (fn [id] {:comment/id (first id)}) (crux/q db children-query))]
+    {:comment/children children}))
+
+(def resolvers [comment-resolver comment-children-resolver create-comment!])

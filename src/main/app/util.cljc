@@ -23,11 +23,12 @@
   "Generate a UUID the same way via clj/cljs.  Without args gives random UUID. With args, builds UUID based on input (which
   is useful in tests)."
   #?(:clj ([](java.util.UUID/randomUUID)))
-  #?(:clj ([int-or-str]
-           (if (int? int-or-str)
-             (java.util.UUID/fromString
-               (format "ffffffff-ffff-ffff-ffff-%012d" int-or-str))
-             (java.util.UUID/fromString int-or-str))))
+  #?(:clj ([input]
+           (cond
+             (int? input) (java.util.UUID/fromString
+                            (format "ffffffff-ffff-ffff-ffff-%012d" input))
+             (uuid? input) input
+             :else (java.util.UUID/fromString input))))
   #?(:cljs ([] (random-uuid)))
   #?(:cljs ([& args]
             (cljs.core/uuid (apply str args)))))

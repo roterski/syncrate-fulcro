@@ -7,8 +7,8 @@
     [com.fulcrologic.fulcro.components :as comp]
     [com.fulcrologic.fulcro.components :as prim :refer [defsc]]))
 
-(defn ui-new-comment-button [this {:keys [new-comment post-id parent-id]}]
+(defn ui-new-comment-button [this {:keys [new-comment post parent]}]
   (div :.ui.container.segment
     (if (empty? new-comment)
-     (button :.ui.button {:onClick #(comp/transact! this `[(add-comment-form {:comment/post-id ~post-id :comment/parent-id ~parent-id})])} "Add comment")
-     (ui-comment-form new-comment {:post-id post-id :parent-id parent-id}))))
+     (button :.ui.button {:onClick #(comp/transact! this `[(add-comment-form {:comment/post ~post :comment/parent ~parent})])} "Add comment")
+     (ui-comment-form new-comment {:post post :parent parent}))))

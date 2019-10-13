@@ -15,7 +15,7 @@
 
 (defn create-post [crux-node account-id {:post/keys [title body] :as post}]
   (let [post-id (util/uuid)
-        profile-uuid (util/uuid)]
+        profile-id (util/uuid)]
     (if (valid-post? post)
       (do
         (crux/submit-tx
@@ -24,11 +24,11 @@
             {:crux.db/id post-id
              :post/title title
              :post/body body
-             :post/profile profile-uuid}]
+             :post/profile profile-id}]
            [:crux.tx/put
-            {:crux.db/id profile-uuid
+            {:crux.db/id profile-id
              :profile/name (random-name)
-             :profile/account account-id}]])
+             :profile/account (util/uuid account-id)}]])
         post-id)
       (throw (ex-info "Post validation failed" post)))))
 
