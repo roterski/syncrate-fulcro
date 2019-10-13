@@ -43,11 +43,15 @@
   (log/debug "Pathom transaction:" (pr-str tx))
   req)
 
+(defn process-error [env err]
+  (log/error "Pathom error: " (pr-str err)))
+
 (defn build-parser [crux-node]
   (let [real-parser (p/parallel-parser
                       {::p/mutate  pc/mutate-async
                        ::p/env     {::p/reader               [p/map-reader pc/parallel-reader
                                                               pc/open-ident-reader p/env-placeholder-reader]
+                                    ::p/process-error process-error
                                     ::p/placeholder-prefixes #{">"}}
                        ::p/plugins [(pc/connect-plugin {::pc/register all-resolvers})
                                     (p/env-wrap-plugin (fn [env]
@@ -58,7 +62,7 @@
                                                            :crux-node crux-node
                                                            :config config)))
                                     (preprocess-parser-plugin log-requests)
-                                    p/error-handler-plugin
+                                    ;p/error-handler-plugin
                                     p/request-cache-plugin
                                     (p/post-process-parser-plugin p/elide-not-found)
                                     p/trace-plugin]})

@@ -2,7 +2,7 @@
   (:require
     [app.posts.mutations :refer [create-post!]]
     [app.database.crux :refer [get-entities node]]
-    [app.util :refer [parse-int]]
+    [app.util :as util]
     [crux.api :as crux]
     [com.wsscode.pathom.connect :as pc :refer [defresolver defmutation]]))
 
@@ -15,7 +15,7 @@
                          `{:find   [e]
                            :where  [[e :post/title _]]
                            :limit  ~per-page
-                           :offset ~(* (dec (parse-int page-number)) per-page)})]
+                           :offset ~(* (dec (util/parse-int page-number)) per-page)})]
     ; TODO: not optimal pagination, naively scrolls through the initial result set each time
     ; https://juxt.pro/crux/docs/queries.html#_ordering_and_pagination
       {:post-list/id id
@@ -39,7 +39,7 @@
                        :where '[[?e :comment/parent parent-id]
                                 [?e :comment/post post-id]]
                        :args [{'parent-id nil
-                               'post-id id}]}
+                               'post-id (util/uuid id)}]}
         comment-ids (mapv (fn [id] {:comment/id (first id)}) (crux/q db comment-query))]
        {:post/comments comment-ids}))
 

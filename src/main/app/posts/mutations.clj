@@ -28,7 +28,7 @@
            [:crux.tx/put
             {:crux.db/id profile-id
              :profile/name (random-name)
-             :profile/account account-id}]])
+             :profile/account (util/uuid account-id)}]])
         post-id)
       (throw (ex-info "Post validation failed" post)))))
 
@@ -40,26 +40,3 @@
     (if account-id
       {:tempids {tempid (create-post crux-node account-id post)}}
       (throw (ex-info "Unauthorized" {:status-code 403 :message "not authenticated"})))))
-
-
-(comment
-  (do
-    (defn all-profiles []
-      (get-entities `{:find [?e]
-                      :where [[?e :profile/name _]]}))
-
-    (defn all-posts []
-      (get-entities `{:find [?e]
-                      :where [[?e :post/title _]]}))))
-
-(comment
-  (all-posts)
-  (all-profiles)
-  (do
-    (def account-id #uuid"51fc1a21-292c-4ae0-a6d5-e49a6cc0f78c")
-    (def post-id #uuid"0e6ac802-4f87-4dc4-9a8e-b67cde3d4507")
-    (defn get-post-profile [post-id]
-      (get-entities `{:find [?profile]
-                      :where [[?profile :crux.db/id]
-                              [?post :post/id ~post-id]
-                              [?post :post/profile ~{}]]}))))
