@@ -30,11 +30,11 @@
                      :output-to        "target/ci.js"
                      :ns-regexp        "-test$"}
 
-          #_#_:workspaces {:target     nubank.workspaces.shadow-cljs.target
-                           :ns-regexp  "-(test|ws)$"
-                           :output-dir "resources/public/workspaces/js"
-                           :asset-path "/workspaces/js"
-                           :devtools   {:preloads           [fulcro.inspect.preload]
-                                        :http-root          "resources/public"
-                                        :http-port          8023
-                                        :http-resource-root "."}}}}
+          :workspaces {:target     nubank.workspaces.shadow-cljs.target
+                       :ns-regexp  "-(test|ws)$"
+                       :output-dir "resources/public/workspaces/js"
+                       :asset-path "/workspaces/js"
+                       :devtools   {:preloads           [com.fulcrologic.fulcro.inspect.preload]
+                                    :http-root          "resources/public"
+                                    :http-port          8023
+                                    :http-resource-root "."}}}}

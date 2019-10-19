@@ -5,7 +5,6 @@
     [app.util :as util]
     [fulcro-spec.core :refer [specification provided behavior assertions]]))
 
-; Tests for both client and server
 (deftest util-uuid-test
   (behavior "returns a valid uuid"
     (assertions
