@@ -50,7 +50,7 @@
       [:script {:src "/js/main/main.js"}]]]))
 
 ;; ================================================================================
-;; Workspaces can be accessed via shadow's http server on http://localhost:8023/workspaces.html
+;; Workspaces can be accessed via shadow's http server on http://localhost:8023/workspaces/workspaces.html
 ;; but that will not allow full-stack fulcro cards to talk to your server. This
 ;; page embeds the CSRF token, and is at `/wslive.html` on your server (i.e. port 3000).
 ;; ================================================================================
